@@ -1,18 +1,17 @@
-
 from typing import List
-import hashlib
+import hashlib, sys, os
 
 
-class Node:
-    def __init__(self, left, right, value: str, content, is_copied=False) -> None:
-        self.left: Node = left
-        self.right: Node = right
+class Leaf:
+    def __init__(self, left, right, value: str, content, is_copied=False):
+        self.left: Leaf = left
+        self.right: Leaf = right
         self.value = value
         self.content = content
         self.is_copied = is_copied
 
     @staticmethod
-    def hash(val: str) -> str:
+    def hash(val: str):
         return hashlib.sha256(val.encode('utf-8')).hexdigest()
 
     def __str__(self):
@@ -22,65 +21,86 @@ class Node:
         """
         class copy function
         """
-        return Node(self.left, self.right, self.value, self.content, True)
+        return Leaf(self.left, self.right, self.value, self.content, True)
 
 
 class MerkleTree:
-    def __init__(self, values: List[str]) -> None:
-        self.__buildTree(values)
+    def __init__(self, values: List[str]):
+        self.buildTree(values)
 
-    def __buildTree(self, values: List[str]) -> None:
+    def buildTree(self, values: List[str]):
 
-        leaves: List[Node] = [Node(None, None, Node.hash(e), e) for e in values]
+        leaves: List[Leaf] = [Leaf(None, None, Leaf.hash(e), e) for e in values]
         if len(leaves) % 2 == 1:
             leaves.append(leaves[-1].copy())  # duplicate last elem if odd number of elements
-        self.root: Node = self.__buildTreeRec(leaves)
+        self.root: Leaf = self.buildTreeRec(leaves)
 
-    def __buildTreeRec(self, nodes: List[Node]) -> Node:
-        if len(nodes) % 2 == 1:
-            nodes.append(nodes[-1].copy())  # duplicate last elem if odd number of elements
-        half: int = len(nodes) // 2
+    def buildTreeRec(self, Leafs: List[Leaf]) -> Leaf:
+        if len(Leafs) % 2 == 1:
+            Leafs.append(Leafs[-1].copy())  # duplicate last elem if odd number of elements
+        half: int = len(Leafs) // 2
 
-        if len(nodes) == 2:
-            return Node(nodes[0], nodes[1], Node.hash(nodes[0].value + nodes[1].value), nodes[0].content+"+"+nodes[1].content)
+        if len(Leafs) == 2:
+            return Leaf(Leafs[0], Leafs[1], Leaf.hash(Leafs[0].value + Leafs[1].value), Leafs[0].content+"+"+Leafs[1].content)
 
-        left: Node = self.__buildTreeRec(nodes[:half])
-        right: Node = self.__buildTreeRec(nodes[half:])
-        value: str = Node.hash(left.value + right.value)
+        left: Leaf = self.buildTreeRec(Leafs[:half])
+        right: Leaf = self.buildTreeRec(Leafs[half:])
+        value: str = Leaf.hash(left.value + right.value)
         content: str = f'{left.content}+{right.content}'
-        return Node(left, right, value, content)
+        return Leaf(left, right, value, content)
 
-    def printTree(self) -> None:
-        self.__printTreeRec(self.root)
+    def printTree(self):
+        self.printTreeRec(self.root)
 
-    def __printTreeRec(self, node: Node) -> None:
-        if node != None:
-            if node.left != None:
-                print("Left: "+str(node.left))
-                print("Right: "+str(node.right))
+    def printTreeRec(self, Leaf: Leaf):
+        if Leaf != None:
+            if Leaf.left != None:
+                print("Left: "+str(Leaf.left))
+                print("Right: "+str(Leaf.right))
             else:
                 print("Input")
                 
-            if node.is_copied:
+            if Leaf.is_copied:
                 print('(Padding)')
-            print("Value: "+str(node.value))
-            print("Content: "+str(node.content))
+            print("Value: "+str(Leaf.value))
+            print("Content: "+str(Leaf.content))
             print("")
-            self.__printTreeRec(node.left)
-            self.__printTreeRec(node.right)
+            self.printTreeRec(Leaf.left)
+            self.printTreeRec(Leaf.right)
 
-    def getRootHash(self) -> str:
+    def getRootHash(self):
         return self.root.value
 
 
-def mixmerkletree() -> None:
-    elems = ["Mix", "Merkle", "Tree", "From", "Onur Atakan ULUSOY", "https://github.com/onuratakan/mixmerkletree", "GO"]
-    print("Inputs: ")
-    print(*elems, sep=" | ")
-    print("")
-    mtree = MerkleTree(elems)
-    print("Root Hash: "+mtree.getRootHash()+"\n")
-    mtree.printTree()
+def makeTree():
+    try:
+        file = open(sys.argv[1])                # try - catch to try to open file
+    except:
+        print("\nError: Please enter a valid text file.\n")         # if not a file, print this and exit program
+        sys.exit(0)
+    elements = file.read()          # read entire file to a string 
+    array = elements.split()        # split into array based on space from string
+    print("Input: ", array)
+    tree = MerkleTree(array)        # make tree from input array ()
+    print("Root Hash: " + tree.getRootHash() + "\n")
+    tree.printTree()
+
+if len(sys.argv) != 2:                                                # Help Message is argv[1] (path to input file) doesn't exist
+    print("\nUsage: 'python3 merkleTree.py <path/to/file.txt>\n")     # Exits program if this statement is true
+    sys.exit(0)
+else:
+    makeTree()  
 
 
-mixmerkletree()
+# https://github.com/onuratakan/mixmerkletree
+# string (address), single space, integer (balance?)
+
+
+# def mixmerkletree():
+#     elems = ["Copy", "Paste", "Repeat", "From", "Daniel U", "Matt N", "Steven N", "Zee K"]
+#     print("Inputs: ")
+#     print(*elems, sep=" | ")
+#     print("")
+#     mtree = MerkleTree(elems)
+#     print("Root Hash: "+mtree.getRootHash()+"\n")
+#     mtree.printTree()
