@@ -20,9 +20,6 @@ class Leaf:
         return (str(self.value))
 
     def copy(self):
-        """
-        class copy function
-        """
         return Leaf(self.left, self.right, self.value, self.content, True)
 
 
@@ -54,25 +51,6 @@ class MerkleTree:
         content: str = f'{left.content}+{right.content}'
         return Leaf(left, right, value, content)
 
-    def printTree(self):
-        self.printTreeRec(self.root)
-
-    def printTreeRec(self, Leaf: Leaf):
-        if Leaf != None:
-            if Leaf.left != None:
-                print("Left: "+str(Leaf.left))
-                print("Right: "+str(Leaf.right))
-            else:
-                print("Input")
-
-            if Leaf.is_copied:
-                print('(Padding)')
-            print("Value: "+str(Leaf.value))
-            print("Content: "+str(Leaf.content))
-            print("")
-            self.printTreeRec(Leaf.left)
-            self.printTreeRec(Leaf.right)
-
     def getRootHash(self):
         return self.root.value
 
@@ -86,7 +64,6 @@ def makeTree():
         sys.exit(0)
     elements = file.read()          # read entire file to a string
     array = elements.split()        # split into array based on space from string
-    print("Input: ", array)
     tree = MerkleTree(array)        # make tree from input array ()
     print("Root Hash: " + tree.getRootHash() + "\n")
 
