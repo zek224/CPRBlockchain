@@ -1,5 +1,7 @@
 from typing import List
-import hashlib, sys, os
+import hashlib
+import sys
+import os
 
 
 class Leaf:
@@ -30,14 +32,17 @@ class MerkleTree:
 
     def buildTree(self, values: List[str]):
 
-        leaves: List[Leaf] = [Leaf(None, None, Leaf.hash(e), e) for e in values]
+        leaves: List[Leaf] = [Leaf(None, None, Leaf.hash(e), e)
+                              for e in values]
         if len(leaves) % 2 == 1:
-            leaves.append(leaves[-1].copy())  # duplicate last elem if odd number of elements
+            # duplicate last elem if odd number of elements
+            leaves.append(leaves[-1].copy())
         self.root: Leaf = self.buildTreeRec(leaves)
 
     def buildTreeRec(self, Leafs: List[Leaf]) -> Leaf:
         if len(Leafs) % 2 == 1:
-            Leafs.append(Leafs[-1].copy())  # duplicate last elem if odd number of elements
+            # duplicate last elem if odd number of elements
+            Leafs.append(Leafs[-1].copy())
         half: int = len(Leafs) // 2
 
         if len(Leafs) == 2:
@@ -59,7 +64,7 @@ class MerkleTree:
                 print("Right: "+str(Leaf.right))
             else:
                 print("Input")
-                
+
             if Leaf.is_copied:
                 print('(Padding)')
             print("Value: "+str(Leaf.value))
@@ -71,36 +76,27 @@ class MerkleTree:
     def getRootHash(self):
         return self.root.value
 
-
 def makeTree():
     try:
-        file = open(sys.argv[1])                # try - catch to try to open file
+        # try - catch to try to open file
+        file = open(sys.argv[1])
     except:
-        print("\nError: Please enter a valid text file.\n")         # if not a file, print this and exit program
+        # if not a file, print this and exit program
+        print("\nError: Please enter a valid text file.\n")
         sys.exit(0)
-    elements = file.read()          # read entire file to a string 
+    elements = file.read()          # read entire file to a string
     array = elements.split()        # split into array based on space from string
     print("Input: ", array)
     tree = MerkleTree(array)        # make tree from input array ()
     print("Root Hash: " + tree.getRootHash() + "\n")
-    tree.printTree()
 
-if len(sys.argv) != 2:                                                # Help Message is argv[1] (path to input file) doesn't exist
-    print("\nUsage: 'python3 merkleTree.py <path/to/file.txt>\n")     # Exits program if this statement is true
+# Help Message is argv[1] (path to input file) doesn't exist
+if len(sys.argv) != 2:
+    # Exits program if this statement is true
+    print("\nUsage: 'python3 merkleTree.py <path/to/file.txt>\n")
     sys.exit(0)
 else:
-    makeTree()  
+    makeTree()
 
 
 # https://github.com/onuratakan/mixmerkletree
-# string (address), single space, integer (balance?)
-
-
-# def mixmerkletree():
-#     elems = ["Copy", "Paste", "Repeat", "From", "Daniel U", "Matt N", "Steven N", "Zee K"]
-#     print("Inputs: ")
-#     print(*elems, sep=" | ")
-#     print("")
-#     mtree = MerkleTree(elems)
-#     print("Root Hash: "+mtree.getRootHash()+"\n")
-#     mtree.printTree()
