@@ -6,20 +6,21 @@ import os
 
 
 class Leaf:
-    def __init__(self, left, right, address: str, balance: int, hashValue: str, is_copied=False):  # is_copied is used to prevent infinite recursion    value = hash of content and content is the actual value
+    # is_copied is used to prevent infinite recursion    value = hash of content and content is the actual value
+    def __init__(self, left, right, address: str, balance: int, hashValue: str, is_copied=False):
         self.left = left        # left child
         self.right = right      # right child
         self.address = address  # address of the leaf
         self.balance = balance  # balance of the leaf
-        self.hashValue = hashValue # hash of the leaf
-        self.is_copied = is_copied 
+        self.hashValue = hashValue  # hash of the leaf
+        self.is_copied = is_copied
 
     @staticmethod
     def hash(value):
         return hashlib.sha256(value.encode('utf-8')).hexdigest()
 
     def __str__(self):
-        return (str(self.value))
+        return (str(self.hashValue))
 
     def copy(self):
         return Leaf(self.left, self.right, self.address, self.balance, self.hashValue, True)
@@ -40,17 +41,19 @@ class MerkleTree:
         for line in values:
             acct = ""
             bal = 0
-            acct, bal = line.split(' ', 1) # split line into two variables
+            acct, bal = line.split(' ', 1)  # split line into two variables
             account.append(acct)
             balance.append(bal)
 
-        Leafs = [Leaf(None, None, account[i], balance[i], Leaf.hash(account[i] + balance[i])) for i in range(len(account))]
+        Leafs = [Leaf(None, None, account[i], balance[i], Leaf.hash(
+            account[i] + balance[i])) for i in range(len(account))]
 
         # leaves = [Leaf(None, None, Leaf.hash(e), e) for e in values]            # makes leaves from all values in array
         if len(Leafs) % 2 == 1:
             # duplicate last elem if odd number of elements
             Leafs.append(Leafs[-1].copy())
-        self.root = self.buildTreeRec(Leafs)           # builds tree from leaves
+        # builds tree from leaves
+        self.root = self.buildTreeRec(Leafs)
 
     def buildTreeRec(self, Leafs):
         if len(Leafs) % 2 == 1:
@@ -60,17 +63,37 @@ class MerkleTree:
 
         if len(Leafs) == 2:
             return Leaf(Leafs[0], Leafs[1], (Leafs[0].address + " + " + Leafs[1].address), (Leafs[0].balance + " + " + Leafs[1].balance), Leaf.hash(Leafs[0].hashValue + Leafs[1].hashValue))
-            
+
         left: Leaf = self.buildTreeRec(Leafs[:half])
         right: Leaf = self.buildTreeRec(Leafs[half:])
         address = left.address + " + " + right.address
         balance = left.balance + " + " + right.balance
         hashValue: str = Leaf.hash(left.hashValue + right.hashValue)
-        #content: str = f'{left.content}+{right.content}'
         return Leaf(left, right, address, balance, hashValue)
 
     def getRootHash(self):
         return self.root.hashValue
+
+    def printTree(self):
+        self.printTreeRec(self.root)
+    
+    def printTreeRec(self, Leaf: Leaf):
+        if Leaf != None:
+            if Leaf.left != None:
+                print("Left: "+str(Leaf.left))
+                print("Right: "+str(Leaf.right))
+            else:
+                print("Input")
+            if Leaf.is_copied:
+                print('(Padding)')
+            print("Hash Value: "+str(Leaf.hashValue))
+            print("Address: "+str(Leaf.address))
+            print("Balance: "+str(Leaf.balance))
+            print("")
+            self.printTreeRec(Leaf.left)
+            self.printTreeRec(Leaf.right)
+        
+
 
 def makeTree():
     try:
@@ -83,21 +106,12 @@ def makeTree():
 
     array = []
 
-
-    # lines = file.readlines()
-    # file.close()
-    # split1 = lines[0].strip().split(" ")
-    # split2 = lines[1].strip().split(" ") 
-    # print(split1)
-    # print(split2)
     for line in file:
         array.append(line.strip())  # add each line to array
 
-    #print(array)
-    #elements = file.read()          # read entire file to a string
-    #array = elements.split()        # split into array based on space from string
     tree = MerkleTree(array)        # make tree from input array ()
     print("Root Hash: " + tree.getRootHash() + "\n")
+    tree.printTree()
 
 # Help Message is argv[1] (path to input file) doesn't exist
 if len(sys.argv) != 2:
