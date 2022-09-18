@@ -5,15 +5,16 @@ import os
 
 
 class Leaf:
-    def __init__(self, left, right, value: str, content, is_copied=False):
-        self.left: Leaf = left
-        self.right: Leaf = right
-        self.value = value
-        self.content = content
-        self.is_copied = is_copied
+    def __init__(self, left, address: str, balance: int, right, hashValue: str, is_copied=False):  # is_copied is used to prevent infinite recursion    value = hash of content and content is the actual value
+        self.left = left        # left child
+        self.right = right      # right child
+        self.address = address  # address of the leaf
+        self.balance = balance  # balance of the leaf
+        self.hashValue = hashValue # hash of the leaf
+        self.is_copied = is_copied 
 
     @staticmethod
-    def hash(val: str):
+    def hash(val):
         return hashlib.sha256(val.encode('utf-8')).hexdigest()
 
     def __str__(self):
@@ -24,23 +25,22 @@ class Leaf:
 
 
 class MerkleTree:
-    def __init__(self, values: List[str]):
+    def __init__(self, values):
         self.buildTree(values)
 
-    def buildTree(self, values: List[str]):
+    def buildTree(self, values):
 
-        leaves: List[Leaf] = [Leaf(None, None, Leaf.hash(e), e)
-                              for e in values]
+        leaves = [Leaf(None, None, Leaf.hash(e), e) for e in values]            # makes leaves from all values in array
         if len(leaves) % 2 == 1:
             # duplicate last elem if odd number of elements
             leaves.append(leaves[-1].copy())
-        self.root: Leaf = self.buildTreeRec(leaves)
+        self.root = self.buildTreeRec(leaves)           # builds tree from leaves
 
-    def buildTreeRec(self, Leafs: List[Leaf]) -> Leaf:
+    def buildTreeRec(self, Leafs):
         if len(Leafs) % 2 == 1:
             # duplicate last elem if odd number of elements
             Leafs.append(Leafs[-1].copy())
-        half: int = len(Leafs) // 2
+        half = len(Leafs) // 2
 
         if len(Leafs) == 2:
             return Leaf(Leafs[0], Leafs[1], Leaf.hash(Leafs[0].value + Leafs[1].value), Leafs[0].content+"+"+Leafs[1].content)
