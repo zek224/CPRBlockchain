@@ -44,8 +44,6 @@ class MerkleTree:
             account.append(acct)
             balance.append(bal)
 
-        print(account)
-
         Leafs = [Leaf(None, None, account[i], balance[i], Leaf.hash(account[i] + balance[i])) for i in range(len(account))]
 
         # leaves = [Leaf(None, None, Leaf.hash(e), e) for e in values]            # makes leaves from all values in array
@@ -61,9 +59,8 @@ class MerkleTree:
         half = len(Leafs) // 2
 
         if len(Leafs) == 2:
-            return Leaf(Leafs[0], Leafs[1], Leaf[0].address + " + " + Leaf[1].address, Leaf[0].balance + " + " + Leaf[1].balance, Leaf.hash(Leafs[0].hashValue + Leafs[1].hashValue))
-            #return Leaf(Leafs[0], Leafs[1], Leaf.hash(Leafs[0].value + Leafs[1].value), Leafs[0].content+"+"+Leafs[1].content)
-
+            return Leaf(Leafs[0], Leafs[1], (Leafs[0].address + " + " + Leafs[1].address), (Leafs[0].balance + " + " + Leafs[1].balance), Leaf.hash(Leafs[0].hashValue + Leafs[1].hashValue))
+            
         left: Leaf = self.buildTreeRec(Leafs[:half])
         right: Leaf = self.buildTreeRec(Leafs[half:])
         address = left.address + " + " + right.address
@@ -73,7 +70,7 @@ class MerkleTree:
         return Leaf(left, right, address, balance, hashValue)
 
     def getRootHash(self):
-        return self.root.value
+        return self.root.hashValue
 
 def makeTree():
     try:
