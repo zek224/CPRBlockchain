@@ -38,39 +38,40 @@ class MerkleTree:
             acct = ""
             bal = 0
             acct, bal = line.split(' ', 1)  # split line into two variables
-            account.append(acct)
-            balance.append(bal)
+            account.append(acct)    # add address to account array
+            balance.append(bal)     # add balance to balance array
 
         # create leafs from the values
         Leafs = [Leaf(None, None, account[i], balance[i], Leaf.hash(
-            account[i] + balance[i])) for i in range(len(account))]
+            account[i] + balance[i])) for i in range(len(account))]    # make leafs from input array
 
         if len(Leafs) % 2 == 1:
             # duplicate last elem if odd number of elements
-            Leafs.append(Leafs[-1].copy())
+            Leafs.append(Leafs[-1].copy())  # copy last element
         # builds tree from leaves
         self.root = self._buildTree(Leafs)
 
     def _buildTree(self, Leafs):
         if len(Leafs) % 2 == 1:
             # duplicate last elem if odd number of elements
-            Leafs.append(Leafs[-1].copy())
-        half = len(Leafs) // 2
+            Leafs.append(Leafs[-1].copy())  # copy last element
+        half = len(Leafs) // 2  # half of the length of Leafs
 
         # create new Leafs from pairs of Leafs
         if len(Leafs) == 2:
+            # return root
             return Leaf(Leafs[0], Leafs[1], (Leafs[0].address + " + " + Leafs[1].address), (Leafs[0].balance + " + " + Leafs[1].balance), Leaf.hash(Leafs[0].hashValue + Leafs[1].hashValue))
 
-        # recursive call
-        left = self._buildTree(Leafs[:half])
-        right = self._buildTree(Leafs[half:])
-        address = left.address + " + " + right.address
-        balance = left.balance + " + " + right.balance
-        hashValue = Leaf.hash(left.hashValue + right.hashValue)
-        return Leaf(left, right, address, balance, hashValue)
+        left = self.buildTreeRec(Leafs[:half])   # left child
+        right = self.buildTreeRec(Leafs[half:])     # right child
+        address = left.address + " + " + right.address  # address of the node
+        balance = left.balance + " + " + right.balance  # balance of the node
+        hashValue = Leaf.hash(
+            left.hashValue + right.hashValue)  # hash of the node
+        return Leaf(left, right, address, balance, hashValue)  # return node
 
     def getRootHash(self):
-        return self.root.hashValue
+        return self.root.hashValue  # return root hash
 
     # def printTree(self):
     #     self._printTree(self.root)
@@ -100,7 +101,7 @@ def makeTree():
     except:
         # if not a file, print this and exit program
         print("\nError: Please enter a valid text file.\n")
-        sys.exit(0)
+        sys.exit(0)  # exit program
 
     array = []
 
@@ -111,13 +112,14 @@ def makeTree():
     print("Root Hash: " + tree.getRootHash() + "\n")
     # tree.printTree()
 
+
 # Help Message is argv[1] (path to input file) doesn't exist
 if len(sys.argv) != 2:
     # Exits program if this statement is true
     print("\nUsage: 'python3 merkleTree.py <path/to/file.txt>\n")
-    sys.exit(0)
+    sys.exit(0)  # exit program
 else:
-    makeTree()
+    makeTree()  # make tree from input file
 
 
 # https://github.com/onuratakan/mixmerkletree
