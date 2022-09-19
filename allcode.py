@@ -6,25 +6,18 @@ import os
 
 
 class Leaf:
-    # is_copied is used to prevent infinite recursion
-    def __init__(self, left, right, address, balance, hashValue, is_copied=False):
+    def __init__(self, left, right, address, balance, hashValue):
         self.left = left        # left child
         self.right = right      # right child
         self.address = address  # address of the leaf
         self.balance = balance  # balance of the leaf
         self.hashValue = hashValue  # hash of the leaf
-        self.is_copied = is_copied
 
     @staticmethod
     def hash(value):
-        return hashlib.sha256(value.encode('utf-8')).hexdigest()
-
+        return hashlib.sha256(value.encode('utf8')).hexdigest()
     def __str__(self):
         return (str(self.hashValue))
-
-    # copys a leaf and returns the copy
-    def copy(self):
-        return Leaf(self.left, self.right, self.address, self.balance, self.hashValue, True)
 
 
 class MerkleTree:
@@ -38,60 +31,93 @@ class MerkleTree:
             acct = ""
             bal = 0
             acct, bal = line.split(' ', 1)  # split line into two variables
+            if(len(acct) != 40):        # check if address is 40 characters
+                print("\nError: Invalid address at input line " + str(values.index(line) + 1) + ".\n")
+                #sys.exit(0)
+            if(not bal.isdigit()):      # check if balance is a number
+                print("\nError: Invalid balance at input line " + str(values.index(line) + 1) + ".\n")
+                #sys.exit(0)
             account.append(acct)
             balance.append(bal)
 
         # create leafs from the values
         Leafs = [Leaf(None, None, account[i], balance[i], Leaf.hash(
-            account[i] + balance[i])) for i in range(len(account))]
+            account[i] + balance[i])) for i in range(len(account))] 
 
-        if len(Leafs) % 2 == 1:
-            # duplicate last elem if odd number of elements
-            Leafs.append(Leafs[-1].copy())
-        # builds tree from leaves
         self.root = self._buildTree(Leafs)
 
     def _buildTree(self, Leafs):
-        if len(Leafs) % 2 == 1:
-            # duplicate last elem if odd number of elements
-            Leafs.append(Leafs[-1].copy())
         half = len(Leafs) // 2
-
         # create new Leafs from pairs of Leafs
         if len(Leafs) == 2:
-            return Leaf(Leafs[0], Leafs[1], (Leafs[0].address + " + " + Leafs[1].address), (Leafs[0].balance + " + " + Leafs[1].balance), Leaf.hash(Leafs[0].hashValue + Leafs[1].hashValue))
+            return Leaf(Leafs[0], Leafs[1], None, None, Leaf.hash(Leafs[0].hashValue + Leafs[1].hashValue))
+        elif len(Leafs) == 1:
+            return Leaf(Leafs[0], None, (Leafs[0].address), (Leafs[0].balance), Leaf.hash(Leafs[0].hashValue))
 
         # recursive call
-        left = self._buildTree(Leafs[:half])
-        right = self._buildTree(Leafs[half:])
-        address = left.address + " + " + right.address
-        balance = left.balance + " + " + right.balance
-        hashValue = Leaf.hash(left.hashValue + right.hashValue)
+        left = self._buildTree(Leafs[:half])    # left child
+        right = self._buildTree(Leafs[half:])   # right child
+        address = None  # address of the new leaf
+        balance = None # balance of the new leaf
+        if right:
+            hashValue = Leaf.hash(left.hashValue + right.hashValue)
+        else:
+            hashValue = Leaf.hash(left.hashValue)
         return Leaf(left, right, address, balance, hashValue)
 
     def getRootHash(self):
         return self.root.hashValue
 
-    # def printTree(self):
-    #     self._printTree(self.root)
+    def printTree(self):
+        self._printTree(self.root)
     
-    # def _printTree(self, Leaf: Leaf):
-    #     if Leaf != None:
-    #         if Leaf.left != None:
-    #             print("Left: "+str(Leaf.left))
-    #             print("Right: "+str(Leaf.right))
-    #         else:
-    #             print("Input")
-    #         if Leaf.is_copied:
-    #             print('(Padding)')
-    #         print("Hash Value: "+str(Leaf.hashValue))
-    #         print("Address: "+str(Leaf.address))
-    #         print("Balance: "+str(Leaf.balance))
-    #         print("")
-    #         self._printTree(Leaf.left)
-    #         self._printTree(Leaf.right)
-        
+    def _printTree(self, Leaf: Leaf):
+        if Leaf != None:
+            if Leaf.left != None:
+                print("Left: "+str(Leaf.left))
+                print("Right: "+str(Leaf.right))
+            else:
+                print("Input")
+            print("Hash Value: "+str(Leaf.hashValue))
+            print("Address: "+str(Leaf.address))
+            print("Balance: "+str(Leaf.balance))
+            print("")
+            self._printTree(Leaf.left)
+            self._printTree(Leaf.right)
 
+    # prints tree in order
+    def printTreeInOrder(self):
+        self._printTreeInOrder(self.root)
+
+    def _printTreeInOrder(self, Leaf: Leaf):
+        if Leaf != None:
+            self._printTreeInOrder(Leaf.left)
+            if Leaf.left != None:
+                print("Left: "+str(Leaf.left))
+                print("Right: "+str(Leaf.right))
+            else:
+                print("Input")
+            print("Hash Value: "+str(Leaf.hashValue))
+            print("Address: "+str(Leaf.address))
+            print("Balance: "+str(Leaf.balance))
+            print("")
+            self._printTreeInOrder(Leaf.right)
+
+    # prints the tree graphically
+    def printTreeGraphically(self):
+        self._printTreeGraphically(self.root, 0)
+
+    def _printTreeGraphically(self, node, level):
+        if node is None:
+            return
+        self._printTreeGraphically(node.right, level + 1)
+        print(' ' * 4 * level + '->', node, end=" ")
+        if node.left is None and node.right is None:
+            print(f'\t[{node.address}, {node.balance}]')
+        else:
+            print()
+        self._printTreeGraphically(node.left, level + 1)
+        
 
 def makeTree():
     try:
@@ -109,7 +135,7 @@ def makeTree():
 
     tree = MerkleTree(array)        # make tree from input array ()
     print("Root Hash: " + tree.getRootHash() + "\n")
-    # tree.printTree()
+    # tree.printTreeGraphically()
 
 # Help Message is argv[1] (path to input file) doesn't exist
 if len(sys.argv) != 2:
@@ -118,6 +144,3 @@ if len(sys.argv) != 2:
     sys.exit(0)
 else:
     makeTree()
-
-
-# https://github.com/onuratakan/mixmerkletree
