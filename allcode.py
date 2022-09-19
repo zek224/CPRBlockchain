@@ -72,24 +72,24 @@ class MerkleTree:
     def getRootHash(self):
         return self.root.hashValue
 
-    def printTree(self):
-        self._printTree(self.root)
+    # def printTree(self):
+    #     self._printTree(self.root)
     
-    def _printTree(self, Leaf: Leaf):
-        if Leaf != None:
-            if Leaf.left != None:
-                print("Left: "+str(Leaf.left))
-                print("Right: "+str(Leaf.right))
-            else:
-                print("Input")
-            if Leaf.is_copied:
-                print('(Padding)')
-            print("Hash Value: "+str(Leaf.hashValue))
-            print("Address: "+str(Leaf.address))
-            print("Balance: "+str(Leaf.balance))
-            print("")
-            self._printTree(Leaf.left)
-            self._printTree(Leaf.right)
+    # def _printTree(self, Leaf: Leaf):
+    #     if Leaf != None:
+    #         if Leaf.left != None:
+    #             print("Left: "+str(Leaf.left))
+    #             print("Right: "+str(Leaf.right))
+    #         else:
+    #             print("Input")
+    #         if Leaf.is_copied:
+    #             print('(Padding)')
+    #         print("Hash Value: "+str(Leaf.hashValue))
+    #         print("Address: "+str(Leaf.address))
+    #         print("Balance: "+str(Leaf.balance))
+    #         print("")
+    #         self._printTree(Leaf.left)
+    #         self._printTree(Leaf.right)
         
 
 
@@ -109,7 +109,7 @@ def makeTree():
 
     tree = MerkleTree(array)        # make tree from input array ()
     print("Root Hash: " + tree.getRootHash() + "\n")
-    tree.printTree()
+    # tree.printTree()
 
 # Help Message is argv[1] (path to input file) doesn't exist
 if len(sys.argv) != 2:
