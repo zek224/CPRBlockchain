@@ -6,8 +6,8 @@ import os
 
 
 class Leaf:
-    # is_copied is used to prevent infinite recursion    value = hash of content and content is the actual value
-    def __init__(self, left, right, address: str, balance: int, hashValue: str, is_copied=False):
+    # is_copied is used to prevent infinite recursion
+    def __init__(self, left, right, address, balance, hashValue, is_copied=False):
         self.left = left        # left child
         self.right = right      # right child
         self.address = address  # address of the leaf
@@ -22,6 +22,7 @@ class Leaf:
     def __str__(self):
         return (str(self.hashValue))
 
+    # copys a leaf and returns the copy
     def copy(self):
         return Leaf(self.left, self.right, self.address, self.balance, self.hashValue, True)
 
@@ -31,20 +32,16 @@ class MerkleTree:
         self.buildTree(array)
 
     def buildTree(self, values):
-
-        # seperate elements in values by space into two variables
-        # values = [address, balance]
-
-        balance: int = []
-        account: str = []
-
-        for line in values:
+        balance = []       # balance of the leafs
+        account = []       # address of the leafs
+        for line in values:     # sploit the values into address and balance
             acct = ""
             bal = 0
             acct, bal = line.split(' ', 1)  # split line into two variables
             account.append(acct)    # add address to account array
             balance.append(bal)     # add balance to balance array
 
+        # create leafs from the values
         Leafs = [Leaf(None, None, account[i], balance[i], Leaf.hash(
             account[i] + balance[i])) for i in range(len(account))]    # make leafs from input array
 
@@ -52,14 +49,15 @@ class MerkleTree:
             # duplicate last elem if odd number of elements
             Leafs.append(Leafs[-1].copy())  # copy last element
         # builds tree from leaves
-        self.root = self.buildTreeRec(Leafs)
+        self.root = self._buildTree(Leafs)
 
-    def buildTreeRec(self, Leafs):
+    def _buildTree(self, Leafs):
         if len(Leafs) % 2 == 1:
             # duplicate last elem if odd number of elements
             Leafs.append(Leafs[-1].copy())  # copy last element
         half = len(Leafs) // 2  # half of the length of Leafs
 
+        # create new Leafs from pairs of Leafs
         if len(Leafs) == 2:
             # return root
             return Leaf(Leafs[0], Leafs[1], (Leafs[0].address + " + " + Leafs[1].address), (Leafs[0].balance + " + " + Leafs[1].balance), Leaf.hash(Leafs[0].hashValue + Leafs[1].hashValue))
@@ -76,9 +74,9 @@ class MerkleTree:
         return self.root.hashValue  # return root hash
 
     def printTree(self):
-        self.printTreeRec(self.root)
-
-    def printTreeRec(self, Leaf):
+        self._printTree(self.root)
+    
+    def _printTree(self, Leaf: Leaf):
         if Leaf != None:
             if Leaf.left != None:
                 print("Left: "+str(Leaf.left))
@@ -91,8 +89,9 @@ class MerkleTree:
             print("Address: "+str(Leaf.address))
             print("Balance: "+str(Leaf.balance))
             print("")
-            self.printTreeRec(Leaf.left)
-            self.printTreeRec(Leaf.right)
+            self._printTree(Leaf.left)
+            self._printTree(Leaf.right)
+        
 
 
 def makeTree():
