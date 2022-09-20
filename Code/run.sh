@@ -1,4 +1,4 @@
 
-import os
- 
-os.system("echo GeeksForGeeks")
+#!/bin/sh
+filename='testInput.txt'
+python3 allcode.py $filename
