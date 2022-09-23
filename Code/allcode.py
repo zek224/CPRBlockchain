@@ -1,5 +1,6 @@
 from array import array
 from typing import List
+import time   #for timestamp in header of each block
 import hashlib
 import sys
 import os
@@ -156,3 +157,55 @@ if len(sys.argv) != 2:
     sys.exit(0)   # exit program
 else:
     makeTree()  # make tree
+
+
+#• hash of the header of the previous block (zero for the initial genesis block)
+#• hash of the root of the Merkle tree stored in the current block
+#• a timestamp as an integer number of seconds since 1970-01-01 00:00:00 UTC (that is, Unix time)
+#• difficulty target
+#• nonce
+
+class Block:
+    def __init__(self, index, timestamp, previous_hash, target, nonce=0):
+        self.index = index   #to store index of block
+        self.timestamp = timestamp
+        self.previous_hash = previous_hash   #to store previous hash
+        self.target = target   #for the difficulty target
+        self.nonce = nonce    
+
+    def compute_hash(self):
+        """
+        A function that return the hash of the block contents.
+        """
+        block_string = {self.__dict__}
+        for key in block_string:
+            hashlib.sha256(block_string[key].encode('utf8')).hexdigest()
+        return block_string
+
+#class Blockchain:
+#    # setting the difficulty target 
+#    difficulty = 2
+
+#    #initialize the blockchain
+#    def __init__(self):
+#        self.chain = []
+
+#    def create_genesis_block(self):
+#        """
+#        A function to generate genesis block and appends it to
+#        the chain. The block has index 0, previous_hash as 0, and
+#        a valid hash.
+#        """
+#        genesis_block = Block(0, 0, [], 0, "0")  #create the genesis block
+#        genesis_block.hash = genesis_block.compute_hash() #hashing for the genesis block
+#        self.chain.append(genesis_block)  #adding the genesis block to the chain
+    
+#    def printBlock():
+#        print("BEGIN BLOCK")
+#        print("BEGIN HEADER")
+#        print("END HEADER")
+#        print("s")
+
+genesis_block = Block(0, 0, [], 0, "0")
+the_block = genesis_block.compute_hash()
+print(the_block)
