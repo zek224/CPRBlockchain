@@ -159,6 +159,8 @@ else:
     makeTree()  # make tree
 
 
+#--------------------------Begin HW 4-------------------------------------
+
 #• hash of the header of the previous block (zero for the initial genesis block)
 #• hash of the root of the Merkle tree stored in the current block
 #• a timestamp as an integer number of seconds since 1970-01-01 00:00:00 UTC (that is, Unix time)
@@ -184,29 +186,29 @@ class Block:
             hashlib.sha256(key.encode('utf8')).hexdigest()
         return list
 
-#class Blockchain:
-#    # setting the difficulty target 
-#    difficulty = 2
+class Blockchain:
+    # setting the difficulty target 
+    difficulty = 2
 
-#    #initialize the blockchain
-#    def __init__(self):
-#        self.chain = []
+    #initialize the blockchain
+    def __init__(self):
+        self.chain = []
 
-#    def create_genesis_block(self):
-#        """
-#        A function to generate genesis block and appends it to
-#        the chain. The block has index 0, previous_hash as 0, and
-#        a valid hash.
-#        """
-#        genesis_block = Block(0, 0, [], 0, "0")  #create the genesis block
-#        genesis_block.hash = genesis_block.compute_hash() #hashing for the genesis block
-#        self.chain.append(genesis_block)  #adding the genesis block to the chain
+    def create_genesis_block(self):
+        """
+        A function to generate genesis block and appends it to
+        the chain. The block has index 0, previous_hash as 0, and
+        a valid hash.
+        """
+        genesis_block = Block(0, 0, [], 0, "0")  #create the genesis block
+        genesis_block.hash = genesis_block.compute_hash() #hashing for the genesis block
+        self.chain.append(genesis_block)  #adding the genesis block to the chain
     
-#    def printBlock():
-#        print("BEGIN BLOCK")
-#        print("BEGIN HEADER")
-#        print("END HEADER")
-#        print("s")
+    def printBlock():
+        print("BEGIN BLOCK")
+        print("BEGIN HEADER")
+        print("END HEADER")
+        print("s")
 
 genesis_block = Block(0, 0, [], 0, "0")
 print(genesis_block.previous_hash)
