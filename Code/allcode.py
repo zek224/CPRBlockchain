@@ -179,8 +179,10 @@ class Block:
         """
         block_string = {} 
         block_string = self.__dict__  #setting dictionary of items into block_string
-        hashlib.sha256(frozenset(block_string.items()).encode('utf8')).hexdigest()
-        return block_string
+        list = frozenset(block_string.items())
+        for key in list:
+            hashlib.sha256(key.encode('utf8')).hexdigest()
+        return list
 
 #class Blockchain:
 #    # setting the difficulty target 
@@ -206,6 +208,5 @@ class Block:
 #        print("END HEADER")
 #        print("s")
 
-#genesis_block = Block(0, 0, [], 0, "0")
-#the_block = genesis_block.compute_hash()
-#print(the_block)
+genesis_block = Block(0, 0, [], 0, "0")
+print(genesis_block.previous_hash)
