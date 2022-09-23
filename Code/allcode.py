@@ -177,9 +177,9 @@ class Block:
         """
         A function that return the hash of the block contents.
         """
-        block_string = {self.__dict__}
-        for key in block_string:
-            hashlib.sha256(block_string[key].encode('utf8')).hexdigest()
+        block_string = {} 
+        block_string = self.__dict__  #setting dictionary of items into block_string
+        hashlib.sha256(frozenset(block_string.items()).encode('utf8')).hexdigest()
         return block_string
 
 #class Blockchain:
@@ -206,6 +206,6 @@ class Block:
 #        print("END HEADER")
 #        print("s")
 
-genesis_block = Block(0, 0, [], 0, "0")
-the_block = genesis_block.compute_hash()
-print(the_block)
+#genesis_block = Block(0, 0, [], 0, "0")
+#the_block = genesis_block.compute_hash()
+#print(the_block)
