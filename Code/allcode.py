@@ -168,27 +168,34 @@ else:
 #• nonce
 
 class Block:
-    def __init__(self, index, timestamp, previous_hash, target, nonce=0):
-        self.index = index   #to store index of block
-        self.timestamp = timestamp
+    def __init__(self, rootHash, timestamp, previous_hash, target, nonce):
+        self.rootHash = rootHash   #to store index of block
+        self.timestamp = time.time()
         self.previous_hash = previous_hash   #to store previous hash
         self.target = target   #for the difficulty target
-        self.nonce = nonce    
+        self.nonce = 0    
 
     def compute_hash(self):
         """
         A function that return the hash of the block contents.
         """
-        block_string = {} 
-        block_string = self.__dict__  #setting dictionary of items into block_string
-        list = frozenset(block_string.items())
-        for key in list:
-            hashlib.sha256(key.encode('utf8')).hexdigest()
-        return list
+        hash = hashlib.sha256()
+        hash.update(
+        str(self.rootHash).encode('utf-8') +
+        str(self.timestamp).encode('utf-8') +
+        str(self.previous_hash).encode('utf-8') +
+        str(self.target).encode('utf-8') +
+        str(self.nonce).encode('utf-8')
+        )
+        return hash.hexdigest
+
+    #You will need to find a nonce such that the nonce concatenated
+    #with the root hash of the Merkle tree is hashed by SHA-256 to a value less than or equal to the specified
+    #target. Please set your target such that the probability of success is 50%
 
 class Blockchain:
     # setting the difficulty target 
-    difficulty = 2
+    difficulty = 2 ** 256
 
     #initialize the blockchain
     def __init__(self):
@@ -197,8 +204,7 @@ class Blockchain:
     def create_genesis_block(self):
         """
         A function to generate genesis block and appends it to
-        the chain. The block has index 0, previous_hash as 0, and
-        a valid hash.
+        the chain.
         """
         genesis_block = Block(0, 0, [], 0, "0")  #create the genesis block
         genesis_block.hash = genesis_block.compute_hash() #hashing for the genesis block
