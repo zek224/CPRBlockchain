@@ -135,14 +135,14 @@ class MerkleTree:
 # read in each argument in argv adn append it to an array. then we have array of all filesname / paths to files.
 def makeTree():
     # makes an array of file inputs for the tree via argv
-    fileInputs = []
-    fileInputs.append(sys.argv[1:])
+    fileInputs = sys.argv[1:]
     print(fileInputs)
 
     for files in fileInputs:
         try:
             # try - catch to try to open file
             file = open(files, "r")
+            print('File opened')
         except:
             # if not a file, print this and exit program
             print("\nError: Please enter a valid text file.\n")
