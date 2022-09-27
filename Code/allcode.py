@@ -1,6 +1,7 @@
 from array import array
+from time import time
 from typing import List
-import time  # for timestamp in header of each block
+import datetime as dt  # for timestamp in header of each block
 import hashlib
 import sys
 import os
@@ -131,29 +132,35 @@ class MerkleTree:
             print()
         self._printTreeGraphically(node.left, level + 1)
 
-
+# read in each argument in argv adn append it to an array. then we have array of all filesname / paths to files.
 def makeTree():
-    try:
-        # try - catch to try to open file
-        file = open(sys.argv[1], "r")
-    except:
-        # if not a file, print this and exit program
-        print("\nError: Please enter a valid text file.\n")
-        sys.exit(0)    # exit program
+    # makes an array of file inputs for the tree via argv
+    fileInputs = []
+    fileInputs.append(sys.argv[1:])
+    print(fileInputs)
 
-    array = []
-    for line in file:
-        array.append(line.strip())  # add each line to array
+    for files in fileInputs:
+        try:
+            # try - catch to try to open file
+            file = open(files, "r")
+        except:
+            # if not a file, print this and exit program
+            print("\nError: Please enter a valid text file.\n")
+            sys.exit(0)    # exit program
 
-    tree = MerkleTree(array)        # make tree from input array ()
-    print("Root Hash: " + tree.getRootHash() + "\n")
-    # tree.printTreeGraphically()
+        array = []
+        for line in file:
+            array.append(line.strip())  # add each line to array
+
+        tree = MerkleTree(array)        # make tree from input array ()
+        print("Root Hash: " + tree.getRootHash() + "\n")
+        # tree.printTreeGraphically()
 
 
 # Help Message is argv[1] (path to input file) doesn't exist
-if len(sys.argv) != 2:
+if len(sys.argv) < 2:
     # Exits program if this statement is true
-    print("\nUsage: 'python3 merkleTree.py <path/to/file.txt>\n")
+    print("\nUsage: 'python3 allcode.py <path/to/file.txt>.....<path/to/file.txt>\n")
     sys.exit(0)   # exit program
 else:
     makeTree()  # make tree
@@ -169,11 +176,14 @@ else:
 
 class Block:
     def __init__(self, hash_prev, hash_root, timestamp, target, nonce):
-        self.hash_prev = Block.compute_hash()
-        self.hash_root = MerkleTree.getRootHash()
-        self.timestamp = time.time()
+        self.hash_prev = hash_prev  #hash of previous block
+        self.hash_root = hash_root  #hash of root of Merkle tree
+        self.timestamp = timestamp
         self.target = target  # for the difficulty target
-        self.nonce = 0
+        self.nonce = nonce
+        self.hash = self.compute_hash() #hash of the previous block
+        # self.roothash = self.MerkleTree.getRootHash() #hash of the root of the Merkle tree stored in the current block
+
 
     def compute_hash(self):
         """
@@ -183,6 +193,17 @@ class Block:
         header_data = str(self.hash_prev) + str(self.hash_root) + str(self.timestamp) + str(self.target) + str(self.nonce)
         hashes.update(header_data.encode('utf-8'))
         return hashes.hexdigest()
+    
+    @staticmethod
+    def create_genesis_block():
+        """
+        A function to manually create a genesis block.
+        The previous hash is set to 0, the root of the hash is set to 0,
+        the timestamp is set to the current time, and the nonce and target
+        are set to 0.
+        """
+        
+        return Block("0", "0", dt.datetime.now(), 0, 0)
 
     # You will need to find a nonce such that the nonce concatenated
     # with the root hash of the Merkle tree is hashed by SHA-256 to a value less than or equal to the specified
@@ -190,30 +211,45 @@ class Block:
 
 
 class Blockchain:
-    nonce = 
-    target = 
+    block_chain = [Block.create_genesis_block()]
+    print("Block1 (Genesis Block): " + str(block_chain[0].hash))
+    print("Hash of previous block:- 0")
+
+    # # nonce =
+    # # target =
 
     # # initialize the blockchain
     # def __init__(self):
-    #     self.chain = []
+    #     self.chain = list()
+    #     genesis_block = self.createblocks("0", "0", dt.datetime.now(), 0, 0)
+    #     self.chain.append(genesis_block)
 
-    def create_genesis_block(self):
-        """
-        A function to generate genesis block and appends it to
-        the chain.
-        """
-        # genesis_block = Block("Genesis")
-        # # genesis_block = Block(0, 0, [], 0, "0")  # create the genesis block
-        # # genesis_block.hash = genesis_block.compute_hash()  # hashing for the genesis block
-        # # # adding the genesis block to the chain
-        # # self.chain.append(genesis_block)
-
-    def printBlock():
-        print("BEGIN BLOCK")
-        print("BEGIN HEADER")
-        print("END HEADER")
-        print("s")
+    # def createblocks(self, hash_prev, hash_root, timestamp, target, nonce):
+    #     self.hash_prev = hash_prev
+    #     self.hash_roor = hash_root
+    #     self.timestamp = dt.dataTime.now()
+    #     self.target = target
+    #     self.nonce = nonce
 
 
-genesis_block = Block(0, 0, [], 0, "0")
-print(genesis_block.compute_hash)
+#         # genesis_block = Block("Genesis")
+#         # timestamp = datetime.datetime.now()
+#         # hash_prev = 0
+#         # return (Block(genesis_block, hash_prev, 0, timestamp, 0, 0))
+
+#         # genesis_block = Block("Genesis")
+#         # # genesis_block = Block(0, 0, [], 0, "0")  # create the genesis block
+#         # # genesis_block.hash = genesis_block.compute_hash()  # hashing for the genesis block
+#         # # # adding the genesis block to the chain
+#         # # self.chain.append(genesis_block)
+
+#     def printBlock():
+#         print("BEGIN BLOCK")
+#         print("BEGIN HEADER")
+#         print("END HEADER")
+#         print("s")
+
+
+genesis_block = Blockchain()
+print(genesis_block)
+# print(genesis_block.compute_hash)
