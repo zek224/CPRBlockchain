@@ -133,9 +133,8 @@ class MerkleTree:
         self._printTreeGraphically(node.left, level + 1)
 
 # read in each argument in argv adn append it to an array. then we have array of all filesname / paths to files.
-def makeTree():
+def makeTree(fileInputs):
     # makes an array of file inputs for the tree via argv
-    fileInputs = sys.argv[1:]
     print(fileInputs)
 
     for files in fileInputs:
@@ -157,13 +156,27 @@ def makeTree():
         # tree.printTreeGraphically()
 
 
-# Help Message is argv[1] (path to input file) doesn't exist
-if len(sys.argv) < 2:
-    # Exits program if this statement is true
-    print("\nUsage: 'python3 allcode.py <path/to/file.txt>.....<path/to/file.txt>\n")
-    sys.exit(0)   # exit program
-else:
-    makeTree()  # make tree
+# if "python3 allcode.py" only, then prompt for file inputs
+if len(sys.argv) == 1:
+    loop = False
+
+    print("\nMake a selection \n1. Enter multiple file names \n2. Enter a folder (all files in folder will be entered) \n3. Exit\n")
+    selectionInput = input("Selection: ")
+    if(selectionInput == "1"):       # multiple file names
+        print("1")
+    elif(selectionInput == "2"):     # folder
+        print("Enter the name of the folder (must be in same directory): ")
+        folderName = input("Folder Name: ")
+        dirList = os.listdir(folderName)
+        dirList = ["{}/{}".format(folderName, i) for i in dirList]
+        makeTree(dirList)
+    else:
+        print("Exitting...")
+        sys.exit(0)
+
+# Makes tree if more than 1 argv
+if len(sys.argv) > 1:
+    makeTree(sys.argv[1:])  # make tree
 
 
 # --------------------------Begin HW 4-------------------------------------
