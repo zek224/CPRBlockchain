@@ -158,12 +158,22 @@ def makeTree(fileInputs):
 
 # if "python3 allcode.py" only, then prompt for file inputs
 if len(sys.argv) == 1:
-    loop = False
-
     print("\nMake a selection \n1. Enter multiple file names \n2. Enter a folder (all files in folder will be entered) \n3. Exit\n")
     selectionInput = input("Selection: ")
     if(selectionInput == "1"):       # multiple file names
-        print("1")
+        print("Enter a single file name one at a time (enter 0 to exit): ")
+        fileNames = []      # array to make tree
+        fileName = ""       # file location var
+        loop = True         # infinite loop unless 0 is entered
+        while(loop):
+            if(fileName == "0"):        # ends loop
+                loop = False
+            else:                       # enter values to be added to array. 0 will still be entered at the end, but is removed below
+                fileName = input("\nEnter the path to a file: ")
+                fileNames.append(fileName)
+        # remove last element from array (which would be 0 to exit loop but also got appended to array)
+        fileNames.pop()
+        makeTree(fileNames)
     elif(selectionInput == "2"):     # folder
         print("Enter the name of the folder (must be in same directory): ")
         folderName = input("Folder Name: ")
