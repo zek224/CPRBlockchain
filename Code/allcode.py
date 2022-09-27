@@ -168,10 +168,10 @@ else:
 # • nonce
 
 class Block:
-    def __init__(self, rootHash, timestamp, previous_hash, target, nonce):
-        self.rootHash = rootHash  # to store index of block
+    def __init__(self, hash_prev, hash_root, timestamp, target, nonce):
+        self.hash_prev = Block.compute_hash()
+        self.hash_root = MerkleTree.getRootHash()
         self.timestamp = time.time()
-        self.previous_hash = MerkleTree.getRootHash  # to store previous hash
         self.target = target  # for the difficulty target
         self.nonce = 0
 
@@ -180,14 +180,9 @@ class Block:
         A function that return the hash of the block contents.
         """
         hashes = hashlib.sha256()
-        hashes.update(
-            str(self.rootHash).encode('utf-8') +
-            str(self.timestamp).encode('utf-8') +
-            str(self.previous_hash).encode('utf-8') +
-            str(self.target).encode('utf-8') +
-            str(self.nonce).encode('utf-8')
-        )
-        return hashes.hexdigest
+        header_data = str(self.hash_prev) + str(self.hash_root) + str(self.timestamp) + str(self.target) + str(self.nonce)
+        hashes.update(header_data.encode('utf-8'))
+        return hashes.hexdigest()
 
     # You will need to find a nonce such that the nonce concatenated
     # with the root hash of the Merkle tree is hashed by SHA-256 to a value less than or equal to the specified
@@ -195,22 +190,23 @@ class Block:
 
 
 class Blockchain:
-    # setting the difficulty target
-    difficulty = 2 ** 256
+    nonce = 
+    target = 
 
-    # initialize the blockchain
-    def __init__(self):
-        self.chain = []
+    # # initialize the blockchain
+    # def __init__(self):
+    #     self.chain = []
 
     def create_genesis_block(self):
         """
         A function to generate genesis block and appends it to
         the chain.
         """
-        genesis_block = Block(0, 0, [], 0, "0")  # create the genesis block
-        genesis_block.hash = genesis_block.compute_hash()  # hashing for the genesis block
-        # adding the genesis block to the chain
-        self.chain.append(genesis_block)
+        # genesis_block = Block("Genesis")
+        # # genesis_block = Block(0, 0, [], 0, "0")  # create the genesis block
+        # # genesis_block.hash = genesis_block.compute_hash()  # hashing for the genesis block
+        # # # adding the genesis block to the chain
+        # # self.chain.append(genesis_block)
 
     def printBlock():
         print("BEGIN BLOCK")
@@ -220,4 +216,4 @@ class Blockchain:
 
 
 genesis_block = Block(0, 0, [], 0, "0")
-print(genesis_block.previous_hash)
+print(genesis_block.compute_hash)
