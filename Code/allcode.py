@@ -32,19 +32,26 @@ class MerkleTree:
         balance = []       # balance of the leafs
         account = []       # address of the leafs
         for line in values:     # split the values into address and balance
-            acct = ""
-            bal = 0
-            acct, bal = line.split(' ', 1)  # split line into two variables
-            if (len(acct) != 40):        # check if address is 40 characters
-                print("\nError: Invalid address at input line " +
-                      str(values.index(line) + 1) + ".\n")
-                # sys.exit(0)
-            if (not bal.isdigit()):      # check if balance is a number
-                print("\nError: Invalid balance at input line " +
-                      str(values.index(line) + 1) + ".\n")
-                # sys.exit(0)
-            account.append(acct)    # add address to account array
-            balance.append(bal)     # add balance to balance array
+            try:
+                acct = ""
+                bal = 0
+                acct, bal = line.split(' ', 1)  # split line into two variables
+                if (len(acct) != 40):        # check if address is 40 characters
+                    print("\nError: Invalid address at input line " +
+                        str(values.index(line) + 1) + ".\n")
+                    # sys.exit(0)
+                if (not bal.isdigit()):      # check if balance is a number
+                    print("\nError: Invalid balance at input line " +
+                        str(values.index(line) + 1) + ".\n")
+                    # sys.exit(0)
+                account.append(acct)    # add address to account array
+                balance.append(bal)     # add balance to balance array
+            except:
+                print("Error while building tree. Values at error point printed.")
+                print(line.split(" ", 1))
+                print(values)
+                sys.exit(-1)
+                
 
         # create leafs from the values
         Leafs = [Leaf(None, None, account[i], balance[i], Leaf.hash(
@@ -133,10 +140,8 @@ class MerkleTree:
         self._printTreeGraphically(node.left, level + 1)
 
 # read in each argument in argv adn append it to an array. then we have array of all filesname / paths to files.
-def makeTree(fileInputs):
-    # makes an array of file inputs for the tree via argv
-    print(fileInputs)
-
+def makeTree(fileInputs):       # reads in fileInputs, which is the list of paths to the different input files
+    print("\nInputted files: ", fileInputs, "\n")
     for files in fileInputs:
         try:
             # try - catch to try to open file
@@ -169,7 +174,7 @@ if len(sys.argv) == 1:
             if(fileName == "0"):        # ends loop
                 loop = False
             else:                       # enter values to be added to array. 0 will still be entered at the end, but is removed below
-                fileName = input("\nEnter the path to a file: ")
+                fileName = input("\nEnter the path to a file (0 to exit): ")
                 fileNames.append(fileName)
         # remove last element from array (which would be 0 to exit loop but also got appended to array)
         fileNames.pop()
@@ -186,7 +191,8 @@ if len(sys.argv) == 1:
 
 # Makes tree if more than 1 argv
 if len(sys.argv) > 1:
-    makeTree(sys.argv[1:])  # make tree
+    makeTree(sys.argv[1:])  # make tree for every file by making an array of file inputs for the tree via argv (ignores argv[0] with is python3 and argv[1] which is program name, takes elements onwards)
+
 
 
 # --------------------------Begin HW 4-------------------------------------
