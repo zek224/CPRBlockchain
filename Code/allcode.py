@@ -29,6 +29,7 @@ class MerkleTree:
     def __init__(self, array):
         self.buildTree(array)
     # we must be entering in a filename into MerkleTree() somewhere
+
     def buildTree(self, values):
         balance = []       # balance of the leafs
         account = []       # address of the leafs
@@ -48,7 +49,8 @@ class MerkleTree:
                 account.append(acct)    # add address to account array
                 balance.append(bal)     # add balance to balance array
             except:
-                print("Error while building tree. Values at error point printed.") # no clue yet, its not an error with the inputs
+                # no clue yet, its not an error with the inputs
+                print("Error while building tree. Values at error point printed.")
                 print("Line: ", line)
                 print(line.split(" ", 1))
                 sys.exit(-1)
@@ -64,10 +66,12 @@ class MerkleTree:
         # create new Leafs from pairs of Leafs
         if len(Leafs) == 2:
             # return the new Leafs
-            return Leaf(Leafs[0], Leafs[1], None, None, Leaf.hash(Leafs[0].hashValue + Leafs[1].hashValue)) # create new Leafs
+            # create new Leafs
+            return Leaf(Leafs[0], Leafs[1], None, None, Leaf.hash(Leafs[0].hashValue + Leafs[1].hashValue))
         elif len(Leafs) == 1:
             # return the new Leafs
-            return Leaf(Leafs[0], None, (Leafs[0].address), (Leafs[0].balance), Leaf.hash(Leafs[0].hashValue))  # create new Leafs
+            # create new Leafs
+            return Leaf(Leafs[0], None, (Leafs[0].address), (Leafs[0].balance), Leaf.hash(Leafs[0].hashValue))
 
         # recursive call
         left = self._buildTree(Leafs[:half])    # left child
@@ -76,11 +80,13 @@ class MerkleTree:
         balance = None  # balance of the new leaf
         if right:
             # hash the new Leafs
-            hashValue = Leaf.hash(left.hashValue + right.hashValue) # hash the new Leafs
+            # hash the new Leafs
+            hashValue = Leaf.hash(left.hashValue + right.hashValue)
         else:
             hashValue = Leaf.hash(left.hashValue)   # hash the new Leafs
         # return the new Leafs
-        return Leaf(left, right, address, balance, hashValue)   # create new Leafs
+        # create new Leafs
+        return Leaf(left, right, address, balance, hashValue)
 
     def getRootHash(self):      # returns the root hash
         return self.root.hashValue
@@ -104,7 +110,7 @@ class MerkleTree:
 
     # prints tree in order
     def printTreeInOrder(self):
-        self._printTreeInOrder(self.root)   
+        self._printTreeInOrder(self.root)
 
     def _printTreeInOrder(self, Leaf):
         if Leaf != None:
@@ -134,7 +140,8 @@ class MerkleTree:
         # print the node with indentation
         print(' ' * 4 * level + '->', node, end=" ")
         if node.left is None and node.right is None:
-            print(f'\t[{node.address}, {node.balance}]')    # prints address and balance
+            # prints address and balance
+            print(f'\t[{node.address}, {node.balance}]')
         else:
             print()
         self._printTreeGraphically(node.left, level + 1)    # recursive call
@@ -146,6 +153,7 @@ class MerkleTree:
 # • a timestamp as an integer number of seconds since 1970-01-01 00:00:00 UTC (that is, Unix time)
 # • difficulty target
 # • nonce
+
 
 class Block:
 
@@ -162,7 +170,7 @@ class Block:
         A function that return the hash of the block contents.
         """
         hashes = hashlib.sha256(((str(self.hash_prev) + str(self.hash_root) + str(
-            self.timestamp) + str(self.target) + str(self.nonce)).encode('utf-8'))).hexdigest() # hash the block
+            self.timestamp) + str(self.target) + str(self.nonce)).encode('utf-8'))).hexdigest()  # hash the block
         return hashes   # return the hash
 
     def set_nonce(self):
@@ -176,13 +184,15 @@ class Block:
                 self.nonce = random.randint(0, 2**32)    # set nonce
         return self.nonce
 
+
 class Blockchain ():
     def __init__(self):
         self.nonce_max = 2 ** 32    # max nonce
         self.target = 2 ** 255  # target
 
     def set_nonce(self, block):
-        object1 = Block(block.hash_prev, block.hash_root)   # create a new block
+        # create a new block
+        object1 = Block(block.hash_prev, block.hash_root)
         target = random.randint(0, 2**32)   # random target
 
         for n in range(self.nonce_max):
@@ -198,6 +208,8 @@ class Blockchain ():
 # read in each rgument in argv adn append it to an array. then we have array of all filesname / paths to files.
 
 # reads in fileInputs, which is the list of paths to the different input files
+
+
 def makeTree(fileInputs):
     print("\nInputted files: ", fileInputs, "\n")   # print inputted files
     array = []  # array of all the transactions
@@ -229,7 +241,7 @@ if len(sys.argv) == 1:
     selectionInput = input("Selection: ")
     if (selectionInput == "1"):       # multiple file names
         print("Enter a single file name one at a time (enter 0 to exit): ")
-        #fileNames = []      # array to make tree
+        # fileNames = []      # array to make tree
         fileName = ""       # file location var
         loop = True         # infinite loop unless 0 is entered
         while (loop):
@@ -272,20 +284,23 @@ for n in range(length):
     if n == 0:
         block = object2.create_genesis_block()  # create genesis block
         object2.set_nonce(block)    # set nonce
-    elif(selectionInput == "2"): 
+    elif (selectionInput == "2"):
         tree = makeTree(dirList)    # make tree
-        merkletree = MerkleTree(tree)    # this should be array of contents of the file, not file names    
-        block = Block(blocksList[-1].compute_hash(), merkletree.getRootHash())  # create block
+        # this should be array of contents of the file, not file names
+        merkletree = MerkleTree(tree)
+        block = Block(blocksList[-1].compute_hash(),
+                      merkletree.getRootHash())  # create block
     else:
         tree = makeTree(fileNames)  # make tree
-        merkletree = MerkleTree(tree)    # this should be array of contents of the file, not file names    
+        # this should be array of contents of the file, not file names
+        merkletree = MerkleTree(tree)
         block = Block(blocksList[-1].compute_hash(), merkletree.getRootHash())
     blocksList.append(block)    # add block to list of blocks
 
-#print files in given format
+# print files in given format
 for i in range(len(blocksList)):
-    print("Begin Block\n")          
-    print("Begin Header\n") 
+    print("Begin Block\n")
+    print("Begin Header\n")
     print("Hash: "+blocksList[i].compute_hash() + "\n")
     print("Hash of root: " + blocksList[i].hash_prev + "\n")
     print("Timestamp: " + str(blocksList[i].timestamp) + "\n")
@@ -298,10 +313,11 @@ for i in range(len(blocksList)):
 os.mkdir("output")
 
 for i in range(len(blocksList)):
-    file_content = open(fileNames[i], 'r')
-    tempFileName = os.path.basename(fileNames[i])
-    tempFileName = tempFileName[:-4] 
-    file = open('output/' + tempFileName + '.block.out', 'w')
+    file_content = open(fileNames[i], 'r')  # open file
+    tempFileName = os.path.basename(fileNames[i])   # get file name
+    tempFileName = tempFileName[:-4]    # remove .txt from file name
+    file = open('output/' + tempFileName +
+                '.block.out', 'w')   # create new file
     file.write("Begin Block\n")
     file.write("Begin Header\n")
     file.write("Hash: "+blocksList[i].compute_hash() + "\n")
@@ -312,8 +328,8 @@ for i in range(len(blocksList)):
     file.write("END HEADER\n")
     file.write("END BLOCK\n")
     file.write("------------------------\n")
-    file_content.close()
-    file_content = open(fileNames[i], 'r')
+    file_content.close()    # close file
+    file_content = open(fileNames[i], 'r')  # open file
     for line in file_content:
-        file.write(line)
-    file.close()
+        file.write(line)    # write contents of file to new file
+    file.close()    # close file
