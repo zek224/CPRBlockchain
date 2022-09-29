@@ -185,13 +185,9 @@ class Blockchain ():
 
 # read in each rgument in argv adn append it to an array. then we have array of all filesname / paths to files.
 
-firstFileName = "test"
 # reads in fileInputs, which is the list of paths to the different input files
 def makeTree(fileInputs):
     print("\nInputted files: ", fileInputs, "\n")   # print inputted files
-    firstFileName = fileInputs[0]
-    print(":: ", fileInputs[0])
-    print(firstFileName)
     array = []  # array of all the transactions
     for files in fileInputs:
         try:
@@ -209,6 +205,7 @@ def makeTree(fileInputs):
 
         tree = MerkleTree(array)        # make tree from input array ()
         print("Root Hash: " + tree.getRootHash() + "\n")
+        file.close()
         # tree.printTreeGraphically()
     return array
 
@@ -289,9 +286,9 @@ for i in range(len(blocksList)):
 
 os.mkdir("output")
 
-
 for i in range(len(blocksList)):
-    tempFileName = os.path.basename(fileNames[i])  # yeah this should work 
+    file_content = open(fileNames[i], 'r')
+    tempFileName = os.path.basename(fileNames[i])
     tempFileName = tempFileName[:-4] 
     file = open('output/' + tempFileName + '.block.out', 'w')
     file.write("Begin Block\n")
@@ -302,7 +299,20 @@ for i in range(len(blocksList)):
     file.write("Target: " + str(blocksList[i].target) + "\n")
     file.write("END HEADER\n")
     file.write("END BLOCK\n")
-    file.write("------------------------\n") 
-    ## write accouts and balances
+    file.write("------------------------\n")
+    file_content.close()
+    file_content = open(fileNames[i], 'r')
+    for line in file_content:
+        file.write(line)
+    file.close()
+
+    #print out accounts and balances from txt file
+    # file = open(fileNames[i], 'r')
+    # for line in file:
+    #     print(line)
+    # file.close()
+
+
 
     
+    # one sec lemme remember
