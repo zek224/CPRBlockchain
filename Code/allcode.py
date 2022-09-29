@@ -197,7 +197,7 @@ def makeTree(fileInputs):
         try:
             # try - catch to try to open file
             file = open(files, "r")
-            print("File", files, "read.")
+            print('File opened')
         except:
             # if not a file, print this and exit program
             print("\nError: Please enter a valid text file.\n")
@@ -291,7 +291,7 @@ os.mkdir("output")
 
 
 for i in range(len(blocksList)):
-    tempFileName = os.path.basename(dirList[i])
+    tempFileName = os.path.basename(fileNames[i])  # yeah this should work 
     tempFileName = tempFileName[:-4] 
     file = open('output/' + tempFileName + '.block.out', 'w')
     file.write("Begin Block\n")
@@ -306,7 +306,3 @@ for i in range(len(blocksList)):
     ## write accouts and balances
 
     
-
-
-
-# Ok lets print accounts & balances then idk how to do that
