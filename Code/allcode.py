@@ -197,7 +197,7 @@ def makeTree(fileInputs):
         try:
             # try - catch to try to open file
             file = open(files, "r")
-            print('File opened')
+            print("File", files, "read.")
         except:
             # if not a file, print this and exit program
             print("\nError: Please enter a valid text file.\n")
