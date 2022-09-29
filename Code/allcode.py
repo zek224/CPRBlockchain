@@ -155,7 +155,7 @@ class Block:
         self.timestamp = dt.datetime.now()  # timestamp
         self.target = 2 ** 255  # for the difficulty target
         self.nonce = 0  # nonce
-        self.max_nonce = 2 ** 32    # max nonce
+        self.nonce_max = 2 ** 32    # max nonce
 
     def compute_hash(self):
         """
@@ -166,10 +166,9 @@ class Block:
         return hashes   # return the hash
 
     def set_nonce(self):
-        #object1 = Block(block.hash_prev, block.hash_root)   # create a new block
         testNonce = random.randint(0, 2**32)   # random target
 
-        for n in range(self.max_nonce):
+        for n in range(self.nonce_max):
             if int(self.compute_hash(), 16) < self.target:
                 self.nonce = testNonce   # set max nonce
                 break   # break
@@ -179,16 +178,16 @@ class Block:
 
 class Blockchain ():
     def __init__(self):
-        self.max_nonce = 2 ** 32    # max nonce
+        self.nonce_max = 2 ** 32    # max nonce
         self.target = 2 ** 255  # target
 
     def set_nonce(self, block):
         object1 = Block(block.hash_prev, block.hash_root)   # create a new block
         target = random.randint(0, 2**32)   # random target
 
-        for n in range(self.max_nonce):
+        for n in range(self.nonce_max):
             if int(object1.compute_hash(), 16) < self.target:
-                self.max_nonce = target   # set max nonce
+                self.nonce_max = target   # set max nonce
                 break   # break
             else:
                 object1.nonce = random.randint(0, 2**32)    # set nonce
@@ -212,7 +211,6 @@ def makeTree(fileInputs):
             print("\nError: Please enter a valid text file.\n")
             sys.exit(0)    # exit program
 
-        #array = []
         for line in file:
             array.append(line.strip())  # add each line to array
 
@@ -264,7 +262,6 @@ if len(sys.argv) == 1:
 # Makes tree if more than 1 argv
 if len(sys.argv) > 1:
     # make tree for every file by making an array of file inputs for the tree via argv (ignores argv[0] with is python3 and argv[1] which is program name, takes elements onwards)
-    # size=len(sys.argv)-2
     makeTree(sys.argv[1:])
 
 object2 = Blockchain()  # create blockchain object
@@ -320,14 +317,3 @@ for i in range(len(blocksList)):
     for line in file_content:
         file.write(line)
     file.close()
-
-    #print out accounts and balances from txt file
-    # file = open(fileNames[i], 'r')
-    # for line in file:
-    #     print(line)
-    # file.close()
-
-
-
-    
-    # one sec lemme remember
