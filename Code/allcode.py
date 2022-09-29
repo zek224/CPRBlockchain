@@ -154,7 +154,7 @@ class Block:
         self.hash_root = hash_root  # hash of root of Merkle tree
         self.timestamp = dt.datetime.now()  # timestamp
         self.target = 2 ** 255  # for the difficulty target
-        self.nonce = 0  # nonce
+        self.nonce = random.randint(0, 2**32)  # nonce
         self.max_nonce = 2 ** 32    # max nonce
 
     def compute_hash(self):
@@ -264,7 +264,6 @@ if len(sys.argv) == 1:
 # Makes tree if more than 1 argv
 if len(sys.argv) > 1:
     # make tree for every file by making an array of file inputs for the tree via argv (ignores argv[0] with is python3 and argv[1] which is program name, takes elements onwards)
-    # size=len(sys.argv)-2
     makeTree(sys.argv[1:])
 
 object2 = Blockchain()  # create blockchain object
@@ -285,6 +284,8 @@ for n in range(length):
         block = Block(blocksList[-1].compute_hash(), merkletree.getRootHash())
     blocksList.append(block)    # add block to list of blocks
 
+
+
 #print files in given format
 for i in range(len(blocksList)):
     print("Begin Block\n")          
@@ -294,9 +295,11 @@ for i in range(len(blocksList)):
     print("Timestamp: " + str(blocksList[i].timestamp) + "\n")
     print("Target: " + str(blocksList[i].target) + "\n")
     print("Nonce: " + str(blocksList[i].set_nonce()) + "\n")
+    print("Nonce: " + str(blocksList[i].nonce) + "\n")
     print("END HEADER\n")
     print("END BLOCK\n")
     print("------------------------\n")
+
 
 os.mkdir("output")
 
@@ -312,6 +315,7 @@ for i in range(len(blocksList)):
     file.write("Timestamp: " + str(blocksList[i].timestamp) + "\n")
     file.write("Target: " + str(blocksList[i].target) + "\n")
     file.write("Nonce: " + str(blocksList[i].set_nonce()) + "\n")
+    file.write("Nonce: " + str(blocksList[i].nonce) + "\n")
     file.write("END HEADER\n")
     file.write("END BLOCK\n")
     file.write("------------------------\n")
@@ -320,14 +324,3 @@ for i in range(len(blocksList)):
     for line in file_content:
         file.write(line)
     file.close()
-
-    #print out accounts and balances from txt file
-    # file = open(fileNames[i], 'r')
-    # for line in file:
-    #     print(line)
-    # file.close()
-
-
-
-    
-    # one sec lemme remember
