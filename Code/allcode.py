@@ -155,6 +155,7 @@ class Block:
         self.timestamp = dt.datetime.now()  # timestamp
         self.target = 2 ** 255  # for the difficulty target
         self.nonce = 0  # nonce
+        self.max_nonce = 2 ** 32    # max nonce
 
     def compute_hash(self):
         """
@@ -163,6 +164,18 @@ class Block:
         hashes = hashlib.sha256(((str(self.hash_prev) + str(self.hash_root) + str(
             self.timestamp) + str(self.target) + str(self.nonce)).encode('utf-8'))).hexdigest() # hash the block
         return hashes   # return the hash
+
+    def set_nonce(self):
+        #object1 = Block(block.hash_prev, block.hash_root)   # create a new block
+        testNonce = random.randint(0, 2**32)   # random target
+
+        for n in range(self.max_nonce):
+            if int(self.compute_hash(), 16) < self.target:
+                self.nonce = testNonce   # set max nonce
+                break   # break
+            else:
+                self.nonce = random.randint(0, 2**32)    # set nonce
+        return self.nonce
 
 class Blockchain ():
     def __init__(self):
@@ -280,6 +293,7 @@ for i in range(len(blocksList)):
     print("Hash of root: " + blocksList[i].hash_prev + "\n")
     print("Timestamp: " + str(blocksList[i].timestamp) + "\n")
     print("Target: " + str(blocksList[i].target) + "\n")
+    print("Nonce: " + str(blocksList[i].set_nonce()) + "\n")
     print("END HEADER\n")
     print("END BLOCK\n")
     print("------------------------\n")
@@ -297,6 +311,7 @@ for i in range(len(blocksList)):
     file.write("Hash of root: " + blocksList[i].hash_prev + "\n")
     file.write("Timestamp: " + str(blocksList[i].timestamp) + "\n")
     file.write("Target: " + str(blocksList[i].target) + "\n")
+    file.write("Nonce: " + str(blocksList[i].set_nonce()) + "\n")
     file.write("END HEADER\n")
     file.write("END BLOCK\n")
     file.write("------------------------\n")
