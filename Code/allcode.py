@@ -49,7 +49,7 @@ class MerkleTree:
                     # sys.exit(0)
                 if (not bal.isdigit()):      # check if balance is a number
                     print("\nError: Invalid balance at input line " +
-                          str(values.index(line) + 1) + ".\n")
+                          str(values.index(line) + 1) + "   " + bal + ".\n")
                     # sys.exit(0)
                 account.append(acct)    # add address to account array
                 balance.append(bal)     # add balance to balance array
@@ -161,7 +161,6 @@ class MerkleTree:
 
 
 class Block:
-
     def __init__(self, hash_prev, hash_root):
         self.hash_prev = hash_prev  # hash of previous block
         self.hash_root = hash_root  # hash of root of Merkle tree
@@ -189,6 +188,13 @@ class Block:
                 self.nonce = random.randint(0, 2**32)    # set nonce
         return self.nonce
 
+    def validate_block(self, inputs):   # inputs is an array of accounts and balances from the #.block.out file (lines 11 to 40)
+        # see if self.hash_root is the same as MerkleTree(inputs).getRootHash()
+        if self.hash_root == MerkleTree(inputs).getRootHash():
+            return True
+        else:
+            return False
+
 
 class Blockchain():
     def __init__(self):
@@ -215,7 +221,7 @@ class Blockchain():
 
 
     # validate a block
-    def validate_block(self, block):
+    def validate_blockchain(self, block):
         # create a new block
         object1 = Block(block.hash_prev, block.hash_root)
         if int(object1.compute_hash(), 16) < self.target:
@@ -310,24 +316,6 @@ if len(sys.argv) > 1:
 
 
 
-# Do we need this stuff here??
-# for n in range(length):
-#     if n == 0:
-#         block = object2.create_genesis_block()  # create genesis block
-#         object2.set_nonce(block)    # set nonce
-#     elif (selectionInput == "2"):
-#         tree = makeTree(dirList)    # make tree
-#         # this should be array of contents of the file, not file names
-#         merkletree = MerkleTree(tree)
-#         block = Block(Blockchain.blockList[-1].compute_hash(),
-#                       merkletree.getRootHash())  # create block
-#     else:
-#         tree = makeTree(fileNames)  # make tree
-#         # this should be array of contents of the file, not file names
-#         merkletree = MerkleTree(tree)
-#         block = Block(Blockchain.blockList[-1].compute_hash(), merkletree.getRootHash())
-#     blockList.append(block)    # add block to list of blocks
-
 
 
 # print files in given format
@@ -367,3 +355,18 @@ for i in range(len(blockchain.blockList) - 1):
     for line in file_content:
         file.write(line)    # write contents of file to new file
     file.close()    # close file
+
+
+testArray = []
+with open('output/1.block.out') as outputfile:
+    # add lines 11 to 40 into testArray
+    for i, line in enumerate(outputfile):
+        if i >= 10:
+            testArray.append(line)
+outputfile.close()
+
+# print testArray out
+for i in range(len(testArray)):
+    print(testArray[i])
+
+print(blockchain.blockList[1].validate_block(testArray))
