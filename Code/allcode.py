@@ -190,7 +190,7 @@ class Block:
         return self.nonce
 
 
-class Blockchain ():
+class Blockchain():
     def __init__(self):
         self.nonce_max = 2 ** 32    # max nonce
         self.target = 2 ** 255  # target
@@ -236,6 +236,7 @@ def makeTree(fileInputs):
     print("\nInputted files: ", fileInputs, "\n")   # print inputted files
     array = []  # array of all the transactions
     for files in fileInputs:
+        array = []  # sets array to empty
         try:
             # try - catch to try to open file
             file = open(files, "r")
@@ -249,9 +250,9 @@ def makeTree(fileInputs):
             array.append(line.strip())  # add each line to array
 
         tree = MerkleTree(array)        # make tree from input array ()
-        #tree.printTreeGraphically()     # print tree graphically
-        #print('\n\n\n')
-        block = Block(blockchain.blockList[-1].compute_hash(), tree.getRootHash())
+        # tree.printTreeGraphically()     # print tree graphically
+        # print('\n\n\n')
+        block = Block(blockchain.blockList[-1].compute_hash(), tree.getRootHash())  # is this reversed?
         blockchain.blockList.append(block)  # add block to blockchain
         print("Root Hash: " + tree.getRootHash() + "\n")
         file.close()
@@ -331,10 +332,10 @@ if len(sys.argv) > 1:
 
 # print files in given format
 for i in range(len(blockchain.blockList)):
-    print("Begin Block\n")
-    print("Begin Header\n")
-    print("Hash of root: "+ blockchain.blockList[i].compute_hash() + "\n")
-    print("Hash of previous block: " + blockchain.blockList[i].hash_prev + "\n")
+    print("BEGIN BLOCK\n")
+    print("BEGIN HEADER\n")
+    print("Block Root Hash: "+ blockchain.blockList[i].compute_hash() + "\n")
+    print("Previous Block Root Hash: " + blockchain.blockList[i].hash_prev + "\n")
     print("Timestamp: " + str(blockchain.blockList[i].timestamp) + "\n")
     print("Target: " + str(blockchain.blockList[i].target) + "\n")
     print("Nonce: " + str(blockchain.blockList[i].set_nonce()) + "\n")
@@ -351,8 +352,8 @@ for i in range(len(blockchain.blockList) - 1):
     tempFileName = tempFileName[:-4]    # remove .txt from file name
     file = open('output/' + tempFileName +
                 '.block.out', 'w')   # create new file
-    file.write("Begin Block\n")
-    file.write("Begin Header\n")
+    file.write("BEGIN BLOCK\n")
+    file.write("BEGIN HEADER\n")
     file.write("Hash of root: "+ blockchain.blockList[i].compute_hash() + "\n")
     file.write("Hash of previous block: " + blockchain.blockList[i].hash_prev + "\n")
     file.write("Timestamp: " + str(blockchain.blockList[i].timestamp) + "\n")
