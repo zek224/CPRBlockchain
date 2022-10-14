@@ -249,6 +249,8 @@ def makeTree(fileInputs):
             array.append(line.strip())  # add each line to array
 
         tree = MerkleTree(array)        # make tree from input array ()
+        #tree.printTreeGraphically()     # print tree graphically
+        #print('\n\n\n')
         block = Block(blockchain.blockList[-1].compute_hash(), tree.getRootHash())
         blockchain.blockList.append(block)  # add block to blockchain
         print("Root Hash: " + tree.getRootHash() + "\n")
@@ -301,7 +303,7 @@ if len(sys.argv) > 1:
     makeTree(sys.argv[1:])
 
 #object2 = Blockchain()  # create blockchain object
-block = None    # block object
+#block = None    # block object
 #blocksList = []    # list of blocks
 
 
@@ -327,17 +329,12 @@ block = None    # block object
 
 
 
-print(blockchain.blockList[0])
-print("\n\n\n")
-
-
-
 # print files in given format
 for i in range(len(blockchain.blockList)):
     print("Begin Block\n")
     print("Begin Header\n")
-    print("Hash: "+ blockchain.blockList[i].compute_hash() + "\n")
-    print("Hash of root: " + blockchain.blockList[i].hash_prev + "\n")
+    print("Hash of root: "+ blockchain.blockList[i].compute_hash() + "\n")
+    print("Hash of previous block: " + blockchain.blockList[i].hash_prev + "\n")
     print("Timestamp: " + str(blockchain.blockList[i].timestamp) + "\n")
     print("Target: " + str(blockchain.blockList[i].target) + "\n")
     print("Nonce: " + str(blockchain.blockList[i].set_nonce()) + "\n")
@@ -347,8 +344,6 @@ for i in range(len(blockchain.blockList)):
 
 os.mkdir("output")
 
-# print length of blocklist
-print("Length of blocklist: " + str(len(blockchain.blockList)))
 
 for i in range(len(blockchain.blockList) - 1):
     file_content = open(fileNames[i], 'r')  # open file
@@ -358,8 +353,8 @@ for i in range(len(blockchain.blockList) - 1):
                 '.block.out', 'w')   # create new file
     file.write("Begin Block\n")
     file.write("Begin Header\n")
-    file.write("Hash: "+ blockchain.blockList[i].compute_hash() + "\n")
-    file.write("Hash of root: " + blockchain.blockList[i].hash_prev + "\n")
+    file.write("Hash of root: "+ blockchain.blockList[i].compute_hash() + "\n")
+    file.write("Hash of previous block: " + blockchain.blockList[i].hash_prev + "\n")
     file.write("Timestamp: " + str(blockchain.blockList[i].timestamp) + "\n")
     file.write("Target: " + str(blockchain.blockList[i].target) + "\n")
     file.write("Nonce: " + str(blockchain.blockList[i].set_nonce()) + "\n")
