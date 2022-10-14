@@ -1,3 +1,4 @@
+from __future__ import generator_stop
 from array import array
 from time import time
 from typing import List
@@ -7,7 +8,11 @@ import sys
 import os
 import random
 
-
+'''
+Merkle Tree class
+- Leaf and MerkleTree class
+- MerkleTree class contains a list of Leaf objects
+'''
 class Leaf:
     def __init__(self, left, right, address, balance, hashValue):
         self.left = left        # left child
@@ -189,26 +194,43 @@ class Blockchain ():
     def __init__(self):
         self.nonce_max = 2 ** 32    # max nonce
         self.target = 2 ** 255  # target
+        self.blockList = []     # list of blocks
 
-    def set_nonce(self, block):
-        # create a new block
-        object1 = Block(block.hash_prev, block.hash_root)
-        target = random.randint(0, 2**32)   # random target
+    # def set_nonce(self, block):
+    #     # create a new block
+    #     object1 = Block(block.hash_prev, block.hash_root)
+    #     target = random.randint(0, 2**32)   # random target
 
-        for n in range(self.nonce_max):
-            if int(object1.compute_hash(), 16) < self.target:
-                self.nonce_max = target   # set max nonce
-                break   # break
-            else:
-                object1.nonce = random.randint(0, 2**32)    # set nonce
+    #     for n in range(self.nonce_max):
+    #         if int(object1.compute_hash(), 16) < self.target:
+    #             self.nonce_max = target   # set max nonce
+    #             break   # break
+    #         else:
+    #             object1.nonce = random.randint(0, 2**32)    # set nonce
 
     def create_genesis_block(self):
-        return Block("0", "0")  # create genesis block
+        genesis_block = Block("0", "0")     # create genesis block
+        self.blockList.append(genesis_block)  # create genesis block
+        return genesis_block  # create genesis block
+
+
+    # validate a block
+    def validate_block(self, block):
+        # create a new block
+        object1 = Block(block.hash_prev, block.hash_root)
+        if int(object1.compute_hash(), 16) < self.target:
+            return True     # return true
+        else:
+            return False    # return false
+
 
 # read in each rgument in argv adn append it to an array. then we have array of all filesname / paths to files.
 
 # reads in fileInputs, which is the list of paths to the different input files
 
+
+blockchain = Blockchain()  # create a blockchain
+blockchain.create_genesis_block()  # create genesis block
 
 def makeTree(fileInputs):
     print("\nInputted files: ", fileInputs, "\n")   # print inputted files
@@ -227,6 +249,8 @@ def makeTree(fileInputs):
             array.append(line.strip())  # add each line to array
 
         tree = MerkleTree(array)        # make tree from input array ()
+        block = Block(blockchain.blockList[-1].compute_hash(), tree.getRootHash())
+        blockchain.blockList.append(block)  # add block to blockchain
         print("Root Hash: " + tree.getRootHash() + "\n")
         file.close()
         # tree.printTreeGraphically()
@@ -276,43 +300,57 @@ if len(sys.argv) > 1:
     # make tree for every file by making an array of file inputs for the tree via argv (ignores argv[0] with is python3 and argv[1] which is program name, takes elements onwards)
     makeTree(sys.argv[1:])
 
-object2 = Blockchain()  # create blockchain object
+#object2 = Blockchain()  # create blockchain object
 block = None    # block object
-blocksList = []    # list of blocks
+#blocksList = []    # list of blocks
 
-for n in range(length):
-    if n == 0:
-        block = object2.create_genesis_block()  # create genesis block
-        object2.set_nonce(block)    # set nonce
-    elif (selectionInput == "2"):
-        tree = makeTree(dirList)    # make tree
-        # this should be array of contents of the file, not file names
-        merkletree = MerkleTree(tree)
-        block = Block(blocksList[-1].compute_hash(),
-                      merkletree.getRootHash())  # create block
-    else:
-        tree = makeTree(fileNames)  # make tree
-        # this should be array of contents of the file, not file names
-        merkletree = MerkleTree(tree)
-        block = Block(blocksList[-1].compute_hash(), merkletree.getRootHash())
-    blocksList.append(block)    # add block to list of blocks
+
+
+
+# Do we need this stuff here??
+# for n in range(length):
+#     if n == 0:
+#         block = object2.create_genesis_block()  # create genesis block
+#         object2.set_nonce(block)    # set nonce
+#     elif (selectionInput == "2"):
+#         tree = makeTree(dirList)    # make tree
+#         # this should be array of contents of the file, not file names
+#         merkletree = MerkleTree(tree)
+#         block = Block(Blockchain.blockList[-1].compute_hash(),
+#                       merkletree.getRootHash())  # create block
+#     else:
+#         tree = makeTree(fileNames)  # make tree
+#         # this should be array of contents of the file, not file names
+#         merkletree = MerkleTree(tree)
+#         block = Block(Blockchain.blockList[-1].compute_hash(), merkletree.getRootHash())
+#     blockList.append(block)    # add block to list of blocks
+
+
+
+print(blockchain.blockList[0])
+print("\n\n\n")
+
+
 
 # print files in given format
-for i in range(len(blocksList)):
+for i in range(len(blockchain.blockList)):
     print("Begin Block\n")
     print("Begin Header\n")
-    print("Hash: "+blocksList[i].compute_hash() + "\n")
-    print("Hash of root: " + blocksList[i].hash_prev + "\n")
-    print("Timestamp: " + str(blocksList[i].timestamp) + "\n")
-    print("Target: " + str(blocksList[i].target) + "\n")
-    print("Nonce: " + str(blocksList[i].set_nonce()) + "\n")
+    print("Hash: "+ blockchain.blockList[i].compute_hash() + "\n")
+    print("Hash of root: " + blockchain.blockList[i].hash_prev + "\n")
+    print("Timestamp: " + str(blockchain.blockList[i].timestamp) + "\n")
+    print("Target: " + str(blockchain.blockList[i].target) + "\n")
+    print("Nonce: " + str(blockchain.blockList[i].set_nonce()) + "\n")
     print("END HEADER\n")
     print("END BLOCK\n")
     print("------------------------\n")
 
 os.mkdir("output")
 
-for i in range(len(blocksList)):
+# print length of blocklist
+print("Length of blocklist: " + str(len(blockchain.blockList)))
+
+for i in range(len(blockchain.blockList) - 1):
     file_content = open(fileNames[i], 'r')  # open file
     tempFileName = os.path.basename(fileNames[i])   # get file name
     tempFileName = tempFileName[:-4]    # remove .txt from file name
@@ -320,11 +358,11 @@ for i in range(len(blocksList)):
                 '.block.out', 'w')   # create new file
     file.write("Begin Block\n")
     file.write("Begin Header\n")
-    file.write("Hash: "+blocksList[i].compute_hash() + "\n")
-    file.write("Hash of root: " + blocksList[i].hash_prev + "\n")
-    file.write("Timestamp: " + str(blocksList[i].timestamp) + "\n")
-    file.write("Target: " + str(blocksList[i].target) + "\n")
-    file.write("Nonce: " + str(blocksList[i].set_nonce()) + "\n")
+    file.write("Hash: "+ blockchain.blockList[i].compute_hash() + "\n")
+    file.write("Hash of root: " + blockchain.blockList[i].hash_prev + "\n")
+    file.write("Timestamp: " + str(blockchain.blockList[i].timestamp) + "\n")
+    file.write("Target: " + str(blockchain.blockList[i].target) + "\n")
+    file.write("Nonce: " + str(blockchain.blockList[i].set_nonce()) + "\n")
     file.write("END HEADER\n")
     file.write("END BLOCK\n")
     file.write("------------------------\n")

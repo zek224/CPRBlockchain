@@ -1,4 +1,8 @@
 #!/bin/sh
 # Run program
-cd ./Code
-python3 ./allcode.py
+
+if [ -d "./Code/output" ]; then
+    rm -rf ./Code/output
+fi
+
+python3 ./Code/allcode.py
