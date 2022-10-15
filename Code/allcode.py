@@ -1,5 +1,6 @@
 from __future__ import generator_stop
 from array import array
+from imp import is_builtin
 from time import time
 from typing import List
 import datetime as dt  # for timestamp in header of each block
@@ -190,6 +191,8 @@ class Block:
 
     def validate_block(self, inputs):   # inputs is an array of accounts and balances from the #.block.out file (lines 11 to 40)
         # see if self.hash_root is the same as MerkleTree(inputs).getRootHash()
+        print(self.hash_root)
+        print(MerkleTree(inputs).getRootHash())
         if self.hash_root == MerkleTree(inputs).getRootHash():
             return True
         else:
@@ -352,30 +355,44 @@ for i in range(len(blockchain.blockList) - 1):
         file.write(line)    # write contents of file to new file
     file.close()    # close file
 
-inputs = []
-testArray = []
-inputs = [0] * len(fileNames)
 
+rows, cols = (len(fileNames), 30)
+testArray = [[]*cols]*rows
+
+#inputs = [0] * len(fileNames)
+inputs=[[]*cols]*rows
+#print("the Length of filesnames is " +str(len(fileNames)))
 for i in range(len(fileNames)):
     testFileName = os.path.basename(fileNames[i])   # get file name
     testFileName = testFileName[:-4]    # remove .txt from file name
     #print(testFileName)
-    testArray.clear()
     with open('output/' + testFileName +'.block.out') as outputfile:
-        # add lines 11 to 40 into testArray
+        # add lines 11 to 40 into testArray1
         for j, line in enumerate(outputfile):
             if j >= 10:
-                testArray.append(line)
-    outputfile.close()
-    inputs[i] = testArray
+                testArray[i].append(line)
+    inputs[i].append(testArray[i])
+    #print(i)
+    #print("viewing output file" + str(outputfile))
+    # #print(testArray)
+    #testArray.clear()
+
+print(inputs)
+
+# valid_block for all inputs\
+# for i in range(len(inputs)):
+#     if blockchain.blockList[i].validate_block(inputs[i]):
+#         print("Block " + str(i) + " is valid")
+#     else:
+#         print("Block " + str(i) + " is invalid")
+
+#print(inputs)
+# for i in range(0, len(inputs)):    
+#     print(blockchain.blockList[i].validate_block(inputs[i]))
+
 # print testArray out
 # for i in range(len(testArray)):
 #     print(testArray[i])
-#print(inputs)
+# print(inputs)
 
-for i in range(1, len(inputs)):
-    print(blockchain.blockList[i].validate_block(inputs[i-1]))
-    
-print(blockchain.blockList[1])
-print("\n")
-print(inputs[0])
+# print(inputs)
