@@ -41,18 +41,18 @@ class MerkleTree:
         for line in values:     # split the values into address and balance
             try:
                 acct = ""
-                bal = 0
                 acct, bal = line.split(' ', 1)  # split line into two variables
+                newBal=bal.replace("\n","")
                 if (len(acct) != 40):        # check if address is 40 characters
-                    print("\nError: Invalid address at input line " +
+                    print("Error: Invalid address at input line " +
                           str(values.index(line) + 1) + ".\n")
-                    # sys.exit(0)
-                if (not bal.isdigit()):      # check if balance is a number
-                    print("\nError: Invalid balance at input line " +
-                          str(values.index(line) + 1) + "   " + bal + ".\n")
+                    sys.exit(0)
+                if (newBal.isdigit() == False):      # check if balance is a number
+                    print("Error: Invalid balance at input line " +
+                          str(values.index(line) + 1) + " " +newBal+ "\n")
                     # sys.exit(0)
                 account.append(acct)    # add address to account array
-                balance.append(bal)     # add balance to balance array
+                balance.append(newBal)     # add balance to balance array
             except:
                 # no clue yet, its not an error with the inputs
                 print("Error while building tree. Values at error point printed.")
@@ -246,7 +246,7 @@ def makeTree(fileInputs):
         try:
             # try - catch to try to open file
             file = open(files, "r")
-            print('File opened')
+            #print('File opened')
         except:
             # if not a file, print this and exit program
             print("\nError: Please enter a valid text file.\n")
@@ -260,7 +260,7 @@ def makeTree(fileInputs):
         # print('\n\n\n')
         block = Block(blockchain.blockList[-1].compute_hash(), tree.getRootHash())  # is this reversed?
         blockchain.blockList.append(block)  # add block to blockchain
-        print("Root Hash: " + tree.getRootHash() + "\n")
+        #print("Root Hash: " + tree.getRootHash() + "\n")
         file.close()
         # tree.printTreeGraphically()
     return array
@@ -314,22 +314,18 @@ if len(sys.argv) > 1:
 #blocksList = []    # list of blocks
 
 
-
-
-
-
 # print files in given format
-for i in range(len(blockchain.blockList)):
-    print("BEGIN BLOCK\n")
-    print("BEGIN HEADER\n")
-    print("Block Root Hash: "+ blockchain.blockList[i].compute_hash() + "\n")
-    print("Previous Block Root Hash: " + blockchain.blockList[i].hash_prev + "\n")
-    print("Timestamp: " + str(blockchain.blockList[i].timestamp) + "\n")
-    print("Target: " + str(blockchain.blockList[i].target) + "\n")
-    print("Nonce: " + str(blockchain.blockList[i].set_nonce()) + "\n")
-    print("END HEADER\n")
-    print("END BLOCK\n")
-    print("------------------------\n")
+# for i in range(len(blockchain.blockList)):
+#     print("BEGIN BLOCK\n")
+#     print("BEGIN HEADER\n")
+#     print("Block Root Hash: "+ blockchain.blockList[i].compute_hash() + "\n")
+#     print("Previous Block Root Hash: " + blockchain.blockList[i].hash_prev + "\n")
+#     print("Timestamp: " + str(blockchain.blockList[i].timestamp) + "\n")
+#     print("Target: " + str(blockchain.blockList[i].target) + "\n")
+#     print("Nonce: " + str(blockchain.blockList[i].set_nonce()) + "\n")
+#     print("END HEADER\n")
+#     print("END BLOCK\n")
+#     print("------------------------\n")
 
 os.mkdir("output")
 
@@ -356,17 +352,30 @@ for i in range(len(blockchain.blockList) - 1):
         file.write(line)    # write contents of file to new file
     file.close()    # close file
 
-
+inputs = []
 testArray = []
-with open('output/1.block.out') as outputfile:
-    # add lines 11 to 40 into testArray
-    for i, line in enumerate(outputfile):
-        if i >= 10:
-            testArray.append(line)
-outputfile.close()
+inputs = [0] * len(fileNames)
 
+for i in range(len(fileNames)):
+    testFileName = os.path.basename(fileNames[i])   # get file name
+    testFileName = testFileName[:-4]    # remove .txt from file name
+    #print(testFileName)
+    testArray.clear()
+    with open('output/' + testFileName +'.block.out') as outputfile:
+        # add lines 11 to 40 into testArray
+        for j, line in enumerate(outputfile):
+            if j >= 10:
+                testArray.append(line)
+    outputfile.close()
+    inputs[i] = testArray
 # print testArray out
-for i in range(len(testArray)):
-    print(testArray[i])
+# for i in range(len(testArray)):
+#     print(testArray[i])
+#print(inputs)
 
-print(blockchain.blockList[1].validate_block(testArray))
+for i in range(1, len(inputs)):
+    print(blockchain.blockList[i].validate_block(inputs[i-1]))
+    
+print(blockchain.blockList[1])
+print("\n")
+print(inputs[0])
