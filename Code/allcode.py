@@ -1,6 +1,5 @@
 from __future__ import generator_stop
 from array import array
-from imp import is_builtin
 from time import time
 from typing import List
 import datetime as dt  # for timestamp in header of each block
@@ -193,8 +192,6 @@ class Block:
 
     def validate_block(self, inputs):   # inputs is an array of accounts and balances from the #.block.out file (lines 11 to 40)
         # see if self.hash_root is the same as MerkleTree(inputs).getRootHash()
-        # print(self.hash_root)
-        # print(MerkleTree(inputs).getRootHash())
         if self.hash_root == MerkleTree(inputs).getRootHash():
             return True
         else:
@@ -224,16 +221,19 @@ class Blockchain():
         self.blockList.append(genesis_block)  # create genesis block
         return genesis_block  # create genesis block
 
-
-    # validate a block
-    def validate_blockchain(self, block):
-        # create a new block
-        object1 = Block(block.hash_prev, block.hash_root)
-        if int(object1.compute_hash(), 16) < self.target:
-            return True     # return true
-        else:
-            return False    # return false
-
+    def validate_blockchain(self, inputfiles, empty):
+        for i in range(1, len(inputfiles) + 1):
+            if (self.blockList[i].validate_block(empty[i - 1]) and blockPrevHash[i] == blockHash[i - 1]):
+                print("Block " + str(i) + " is valid")
+                # print("Block hash prev: ", blockPrevHash[i])
+                # print("Block hash root: ", blockHash[i - 1])
+            else:
+                print("Block " + str(i) + " is invalid")
+                print("Block hash prev: ", blockPrevHash[i])
+                print("Block hash root: ", blockHash[i - 1])
+                return False
+        print("Blockchain validated.")
+        return True
 
 # read in each rgument in argv adn append it to an array. then we have array of all filesname / paths to files.
 
@@ -314,23 +314,25 @@ if len(sys.argv) > 1:
     # make tree for every file by making an array of file inputs for the tree via argv (ignores argv[0] with is python3 and argv[1] which is program name, takes elements onwards)
     makeTree(sys.argv[1:])
 
-#object2 = Blockchain()  # create blockchain object
-#block = None    # block object
-#blocksList = []    # list of blocks
 
+blockHash = []
+blockPrevHash = []
 
-# print files in given format
-# for i in range(len(blockchain.blockList)):
-#     print("BEGIN BLOCK\n")
-#     print("BEGIN HEADER\n")
-#     print("Block Root Hash: "+ blockchain.blockList[i].compute_hash() + "\n")
-#     print("Previous Block Root Hash: " + blockchain.blockList[i].hash_prev + "\n")
-#     print("Timestamp: " + str(blockchain.blockList[i].timestamp) + "\n")
-#     print("Target: " + str(blockchain.blockList[i].target) + "\n")
-#     print("Nonce: " + str(blockchain.blockList[i].set_nonce()) + "\n")
-#     print("END HEADER\n")
-#     print("END BLOCK\n")
-#     print("------------------------\n")
+for i in range(len(blockchain.blockList)):
+    blockHash.append(blockchain.blockList[i].compute_hash())
+    blockPrevHash.append(blockchain.blockList[i].hash_prev)
+    print("BEGIN BLOCK\n")
+    print("BEGIN HEADER\n")
+    # print("Block Root Hash: "+ blockchain.blockList[i].compute_hash() + "\n")
+    # print("Previous Block Root Hash: " + blockchain.blockList[i].hash_prev + "\n")
+    print("Block Root Hash: "+ blockHash[i] + "\n")
+    print("Previous Block Root Hash: " + blockPrevHash[i] + "\n")
+    print("Timestamp: " + str(blockchain.blockList[i].timestamp) + "\n")
+    print("Target: " + str(blockchain.blockList[i].target) + "\n")
+    print("Nonce: " + str(blockchain.blockList[i].set_nonce()) + "\n")
+    print("END HEADER\n")
+    print("END BLOCK\n")
+    print("------------------------\n")
 
 os.mkdir("output")
 
@@ -343,8 +345,10 @@ for i in range(len(blockchain.blockList) - 1):
                 '.block.out', 'w')   # create new file
     file.write("BEGIN BLOCK\n")
     file.write("BEGIN HEADER\n")
-    file.write("Hash of root: "+ blockchain.blockList[i].compute_hash() + "\n")
-    file.write("Hash of previous block: " + blockchain.blockList[i].hash_prev + "\n")
+    # file.write("Hash of root: "+ blockchain.blockList[i].compute_hash() + "\n")
+    # file.write("Hash of previous block: " + blockchain.blockList[i].hash_prev + "\n")
+    file.write("Hash of root: "+ blockHash[i] + "\n")
+    file.write("Hash of previous block: " + blockPrevHash[i] + "\n")
     file.write("Timestamp: " + str(blockchain.blockList[i].timestamp) + "\n")
     file.write("Target: " + str(blockchain.blockList[i].target) + "\n")
     file.write("Nonce: " + str(blockchain.blockList[i].set_nonce()) + "\n")
@@ -357,16 +361,7 @@ for i in range(len(blockchain.blockList) - 1):
         file.write(line)    # write contents of file to new file
     file.close()    # close file
 
-
-# rows, cols = (len(fileNames), 30)
-# testArray = [[]*cols]*rows
-
-# #inputs = [0] * len(fileNames)
-# inputs=[[]*cols]*rows
-#print("the Length of filesnames is " +str(len(fileNames)))
-
 testArray = []
-inputs = []
 for i in range(len(fileNames)):
     testFileName = os.path.basename(fileNames[i])   # get file name
     testFileName = testFileName[:-4]    # remove .txt from file name
@@ -376,58 +371,22 @@ for i in range(len(fileNames)):
         for j, line in enumerate(outputfile):
             if j >= 10:
                 testArray.append(line)
-    # print(testArray[i])
-    #print(i)
-    #print("viewing output file" + str(outputfile))
-    # #print(testArray)
-    #testArray.clear()
-#print(type(testArray))
-# test = np.array(testArray)
-# print(test)
+
 splits = np.array_split(testArray, len(fileNames))
 # print(len(splits))
 empty_list = []
 for i in splits:
     empty_list.append(i.tolist())
-    
-for j in range(1, len(fileNames)):
-    print(blockchain.blockList[j].validate_block(empty_list[j - 1]))
+
+blockchain.validate_blockchain(fileNames, empty_list)
+
+
+# for j in range(1, len(fileNames) + 1):
+#     if blockchain.blockList[j].validate_block(empty_list[j - 1]):
+#         print("Block " + str(j) + " is valid")
+#     else:
+#         print("Block " + str(j) + " is invalid")
     
     # for j in range(len(i)):
     #     #validate_block for each array produced by np.array_split
     #      blockchain.blockList[j].validate_block(i[int(j)])
-
-
-    # blockchain.blockList[i].validate_block(list(i))
-    # for j in range(len(list(i))):
-    #     blockchain.blockList[i].validate_block(i)
-
-    # if blockchain.blockList[i].validate_block(temp):
-    #     print("Block " + str(i) + " is valid")
-    # else:
-    #     print("Block " + str(i) + " is invalid")
-    # print(list(i))
-    
-
-# for i in sub_lists:
-#     print("List ", count, ": ",list(i))
-#     count+=1
-# print(splits)
-
-# valid_block for all inputs\
-# for i in range(len(inputs)):
-#     if blockchain.blockList[i].validate_block(inputs[i]):
-#         print("Block " + str(i) + " is valid")
-#     else:
-#         print("Block " + str(i) + " is invalid")
-
-#print(inputs)
-# for i in range(0, len(inputs)):    
-#     print(blockchain.blockList[i].validate_block(inputs[i]))
-
-# print testArray out
-# for i in range(len(testArray)):
-#     print(testArray[i])
-# print(inputs)
-
-# print(inputs)
