@@ -8,6 +8,7 @@ import hashlib
 import sys
 import os
 import random
+import numpy as np
 
 '''
 Merkle Tree class
@@ -40,7 +41,7 @@ class MerkleTree:
         balance = []       # balance of the leafs
         account = []       # address of the leafs
         for line in values:     # split the values into address and balance
-            try:
+            # try:
                 acct = ""
                 acct, bal = line.split(' ', 1)  # split line into two variables
                 newBal=bal.replace("\n","")
@@ -54,12 +55,12 @@ class MerkleTree:
                     # sys.exit(0)
                 account.append(acct)    # add address to account array
                 balance.append(newBal)     # add balance to balance array
-            except:
-                # no clue yet, its not an error with the inputs
-                print("Error while building tree. Values at error point printed.")
-                print("Line: ", line)
-                print(line.split(" ", 1))
-                sys.exit(-1)
+            # except:
+            #     # no clue yet, its not an error with the inputs
+            #     print("Error while building tree. Values at error point printed.")
+            #     print("Line: ", line)
+            #     print(line.split(" ", 1))
+            #     sys.exit(-1)
 
         # create leafs from the values
         Leafs = [Leaf(None, None, account[i], balance[i], Leaf.hash(
@@ -356,12 +357,15 @@ for i in range(len(blockchain.blockList) - 1):
     file.close()    # close file
 
 
-rows, cols = (len(fileNames), 30)
-testArray = [[]*cols]*rows
+# rows, cols = (len(fileNames), 30)
+# testArray = [[]*cols]*rows
 
-#inputs = [0] * len(fileNames)
-inputs=[[]*cols]*rows
+# #inputs = [0] * len(fileNames)
+# inputs=[[]*cols]*rows
 #print("the Length of filesnames is " +str(len(fileNames)))
+
+testArray = []
+inputs = []
 for i in range(len(fileNames)):
     testFileName = os.path.basename(fileNames[i])   # get file name
     testFileName = testFileName[:-4]    # remove .txt from file name
@@ -370,14 +374,44 @@ for i in range(len(fileNames)):
         # add lines 11 to 40 into testArray1
         for j, line in enumerate(outputfile):
             if j >= 10:
-                testArray[i].append(line)
-    inputs[i].append(testArray[i])
+                testArray.append(line)
+    # print(testArray[i])
     #print(i)
     #print("viewing output file" + str(outputfile))
     # #print(testArray)
     #testArray.clear()
+#print(type(testArray))
+# test = np.array(testArray)
+# print(test)
+splits = np.array_split(testArray, len(fileNames))
+# print(len(splits))
+empty_list = []
+for i in splits:
+    empty_list.append(i.tolist())
+    
+for j in range(1, len(empty_list)):
+    print(blockchain.blockList[j].validate_block(empty_list[j - 1]))
+    
+    # for j in range(len(i)):
+    #     #validate_block for each array produced by np.array_split
+    #      blockchain.blockList[j].validate_block(i[int(j)])
 
-print(inputs)
+
+    # blockchain.blockList[i].validate_block(list(i))
+    # for j in range(len(list(i))):
+    #     blockchain.blockList[i].validate_block(i)
+
+    # if blockchain.blockList[i].validate_block(temp):
+    #     print("Block " + str(i) + " is valid")
+    # else:
+    #     print("Block " + str(i) + " is invalid")
+    # print(list(i))
+    
+
+# for i in sub_lists:
+#     print("List ", count, ": ",list(i))
+#     count+=1
+# print(splits)
 
 # valid_block for all inputs\
 # for i in range(len(inputs)):
