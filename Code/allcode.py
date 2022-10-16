@@ -390,7 +390,7 @@ empty_list = []
 for i in splits:
     empty_list.append(i.tolist())
     
-for j in range(1, len(fileNames)):
+for j in range(1, len(fileNames)+1):
     print(blockchain.blockList[j].validate_block(empty_list[j - 1]))
     
     # for j in range(len(i)):
