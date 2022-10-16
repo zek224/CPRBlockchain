@@ -339,7 +339,7 @@ def runChainValidation():
         testFileName = os.path.basename(fileNames[i])   # get file name
         testFileName = testFileName[:-4]    # remove .txt from file name
         # print(testFileName)
-        with open('output/' + testFileName + '.block.out') as outputfile:
+        with open('falseBlocks/' + testFileName + '.block.out') as outputfile:
             # add lines 11 to 40 into testArray1
             for j, line in enumerate(outputfile):
                 if j >= 10:
