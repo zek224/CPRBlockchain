@@ -163,24 +163,25 @@ class MerkleTree:
         self._printTreeGraphically(node.left, level + 1)    # recursive call
 
     # traverse the merkle tree and find a leaf with the given address
-    def findLeaf(self, address):
-        return self._findLeaf(self.root, address)
+    def findLeaf(self, address, path):
+        return self._findLeaf(self.root, address, path)
 
-    def _findLeaf(self, Leaf, address, path=[]):
+    def _findLeaf(self, Leaf, address, path):
         if Leaf != None:
             if Leaf.left != None:
                 # recursive call
                 path.append(Leaf.hashValue)     # add hash value to path for PoM
-                return self._findLeaf(Leaf.left, address) or self._findLeaf(Leaf.right, address)
+                return self._findLeaf(Leaf.left, address, path) or self._findLeaf(Leaf.right, address, path)
             else:
                 if Leaf.address == address:
                     path.append(Leaf.hashValue)
-                    return Leaf.balance, path
+                    print(path)
+                    return Leaf.balance
                 else:
                     path.pop()                  # remove hash value from path if incorrect
                     return None
 
-    def get_balance(self, address):
+    def get_balance(self, address, path=[]):
         '''
         we need to open every txt file
         we will use hashmap (every address(key) maps to a balance(value))
@@ -189,7 +190,7 @@ class MerkleTree:
         if address is in hashmap, return balance map['address'], if not return does not exist message
         '''
         
-        return self.findLeaf(address)
+        return self.findLeaf(address, path)
 
 
 class Block:
@@ -408,10 +409,10 @@ def checkAddressForBalance():
     addressToCheck = input("Provide an address to check for a balance(40 characters long)\n")
     
     for i in range(len(merkle_trees)):
-        balance, path = merkle_trees[i].get_balance(addressToCheck)
+        balance = merkle_trees[i].get_balance(addressToCheck)
         if(balance is not None):
-            print("Balance: ", balance)
-            print("Proof of Membership path: ", path)
+            print("\nBalance: ", balance)
+            #print("Proof of Membership path: ", path)
             return balance
     print("Address not found")
 
