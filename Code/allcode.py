@@ -9,6 +9,7 @@ import sys
 import os
 import random
 import numpy as np
+import math
 
 '''
 Merkle Tree class
@@ -41,7 +42,7 @@ class MerkleTree:
         balance = []       # balance of the leafs
         account = []       # address of the leafs
         for line in values:     # split the values into address and balance
-            # try:
+            try:
                 acct = ""
                 acct, bal = line.split(' ', 1)  # split line into two variables
                 newBal=bal.replace("\n","")
@@ -55,12 +56,12 @@ class MerkleTree:
                     # sys.exit(0)
                 account.append(acct)    # add address to account array
                 balance.append(newBal)     # add balance to balance array
-            # except:
-            #     # no clue yet, its not an error with the inputs
-            #     print("Error while building tree. Values at error point printed.")
-            #     print("Line: ", line)
-            #     print(line.split(" ", 1))
-            #     sys.exit(-1)
+            except:
+                # no clue yet, its not an error with the inputs
+                print("Error while building tree. Values at error point printed.")
+                print("Line: ", line)
+                print(line.split(" ", 1))
+                sys.exit(-1)
 
         # create leafs from the values
         Leafs = [Leaf(None, None, account[i], balance[i], Leaf.hash(
@@ -166,7 +167,7 @@ class Block:
     def __init__(self, hash_prev, hash_root):
         self.hash_prev = hash_prev  # hash of previous block
         self.hash_root = hash_root  # hash of root of Merkle tree
-        self.timestamp = dt.datetime.now()  # timestamp
+        self.timestamp = math.trunc(dt.datetime.now().timestamp())  # timestamp
         self.target = 2 ** 255  # for the difficulty target
         self.nonce = 0  # nonce
         self.nonce_max = 2 ** 32    # max nonce
@@ -192,8 +193,8 @@ class Block:
 
     def validate_block(self, inputs):   # inputs is an array of accounts and balances from the #.block.out file (lines 11 to 40)
         # see if self.hash_root is the same as MerkleTree(inputs).getRootHash()
-        print(self.hash_root)
-        print(MerkleTree(inputs).getRootHash())
+        # print(self.hash_root)
+        # print(MerkleTree(inputs).getRootHash())
         if self.hash_root == MerkleTree(inputs).getRootHash():
             return True
         else:
@@ -389,7 +390,7 @@ empty_list = []
 for i in splits:
     empty_list.append(i.tolist())
     
-for j in range(1, len(empty_list)):
+for j in range(1, len(fileNames)):
     print(blockchain.blockList[j].validate_block(empty_list[j - 1]))
     
     # for j in range(len(i)):
