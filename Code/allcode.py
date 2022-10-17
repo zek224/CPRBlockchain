@@ -285,8 +285,8 @@ def makeTree(fileInputs):
 
         tree = MerkleTree(array)        # make tree from input array ()
         merkle_trees.append(tree)       # add tree to list of trees
-        tree.printTreeGraphically()     # print tree graphically
-        print('\n\n\n')
+        # tree.printTreeGraphically()     # print tree graphically
+        # print('\n\n\n')
         # is this reversed?
         block = Block(
             blockchain.blockList[-1].compute_hash(), tree.getRootHash())
@@ -356,13 +356,13 @@ def runChainValidation():
 
 
 # Makes tree if more than 1 argv
-if len(sys.argv) > 1:
-    if (sys.argv[1] == "--validate"):
-        print("run block validation")
-        runChainValidation()
-    else:
-        # make tree for every file by making an array of file inputs for the tree via argv (ignores argv[0] with is python3 and argv[1] which is program name, takes elements onwards)
-        makeTree(sys.argv[1:])
+# if len(sys.argv) > 1:
+#     if (sys.argv[1] == "--validate"):
+#         print("run block validation")
+#         runChainValidation()
+#     else:
+#         # make tree for every file by making an array of file inputs for the tree via argv (ignores argv[0] with is python3 and argv[1] which is program name, takes elements onwards)
+#         makeTree(sys.argv[1:])
 
 
 for i in range(len(blockchain.blockList)):
@@ -409,16 +409,15 @@ runChainValidation()
 
 
 def checkAddressForBalance():
-    addressToCheck = input(
-        "Provide an address to check for a balance(40 characters long)\n")
-
-    for i in range(len(merkle_trees)):
-        balance = merkle_trees[i].get_balance(addressToCheck)
-        if (balance is not None):
-            print("\nBalance: ", balance)
-            #print("Proof of Membership path: ", path)
-            return balance
-    print("Address not found")
+    while True:
+        addressToCheck = input("Provide an address to check for a balance(40 characters long) \n")
+        for i in range(len(merkle_trees)):
+            balance = merkle_trees[i].get_balance(addressToCheck)
+            if (balance is not None):
+                print("\nBalance: ", balance)
+                #print("Proof of Membership path: ", path)
+                return balance
+        print("Address not found")        
 
 
 # for i in range(len(merkle_trees)):
