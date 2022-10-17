@@ -27,3 +27,9 @@ You will continue to be prompted to enter an address until successful.
 You can take an address from the `output` file.  
 Next, an array is printed with the path from the leaf to the root to show proof of membership,
 as well as return the balance.
+
+
+```Things We need```
+1)  Change from root to hash of account, to account to root
+2)  Check bad blocks better method
+3)  What are we printing out? and how we outputting it
