@@ -126,7 +126,7 @@ class MerkleTree:
 
     # prints tree in order
     def printTreeInOrder(self):
-        self._printTreeInOrder(self.root)
+        self._printTreeInOrder(self.root)   # prints tree in order
 
     def _printTreeInOrder(self, Leaf):
         if Leaf != None:
@@ -164,7 +164,7 @@ class MerkleTree:
 
     # traverse the merkle tree and find a leaf with the given address
     def findLeaf(self, address, path):
-        return self._findLeaf(self.root, address, path)
+        return self._findLeaf(self.root, address, path)    # traverse the tree
 
     def _findLeaf(self, Leaf, address, path):
         if Leaf != None:
@@ -172,15 +172,15 @@ class MerkleTree:
                 # recursive call
                 # add hash value to path for PoM
                 path.append(Leaf.hashValue)
-                return self._findLeaf(Leaf.left, address, path) or self._findLeaf(Leaf.right, address, path)
+                return self._findLeaf(Leaf.left, address, path) or self._findLeaf(Leaf.right, address, path)    
             else:
                 if Leaf.address == address:
-                    path.append(Leaf.hashValue)
-                    print(path)
-                    return Leaf.balance
+                    path.append(Leaf.hashValue)    # add hash value to path for PoM
+                    print(path)    # print path for PoM
+                    return Leaf.balance   # return balance
                 else:
                     path.pop()                  # remove hash value from path if incorrect
-                    return None
+                    return None                # return None if incorrect
 
     def get_balance(self, address, path=[]):
         '''
@@ -191,7 +191,7 @@ class MerkleTree:
         if address is in hashmap, return balance map['address'], if not return does not exist message
         '''
 
-        return self.findLeaf(address, path)
+        return self.findLeaf(address, path)   # traverse the tree
 
 
 class Block:
@@ -226,7 +226,7 @@ class Block:
     def validate_block(self, inputs):
         # see if self.hash_root is the same as MerkleTree(inputs).getRootHash()
         if self.hash_root == MerkleTree(inputs).getRootHash():
-            return True
+            return True    # return true if valid
         else:
             return False
 
@@ -246,15 +246,15 @@ class Blockchain():
 
     def validate_blockchain(self, inputfiles, empty):
         for i in range(1, len(inputfiles) + 1):
-            if (self.blockList[i].validate_block(empty[i - 1]) and blockchain.blockPrevHashes[i] == blockchain.blockHashes[i - 1]):
-                print("Block " + str(i) + " is valid")
+            if (self.blockList[i].validate_block(empty[i - 1]) and blockchain.blockPrevHashes[i] == blockchain.blockHashes[i - 1]): # validate block
+                print("Block " + str(i) + " is valid")  # print valid
             else:
                 print("Block " + str(i) + " is invalid")
-                print("Block hash prev: ", blockchain.blockPrevHashes[i])
-                print("Block hash root: ", blockchain.blockHashes[i - 1])
+                print("Block hash prev: ", blockchain.blockPrevHashes[i])   # print invalid
+                print("Block hash root: ", blockchain.blockHashes[i - 1])   # print invalid
                 return False
-        print("Blockchain validated.")
-        return True
+        print("Blockchain validated.")  # print valid
+        return True # return true if valid
 
 # read in each rgument in argv adn append it to an array. then we have array of all filesname / paths to files.
 
@@ -292,8 +292,8 @@ def makeTree(fileInputs):
             blockchain.blockList[-1].compute_hash(), tree.getRootHash())
         blockchain.blockList.append(block)  # add block to blockchain
         #print("Root Hash: " + tree.getRootHash() + "\n")
-        file.close()
-    return array
+        file.close()    # close file
+    return array        # return array
 
 
 # if "python3 allcode.py" only, then prompt for file inputs where user input starts
@@ -304,7 +304,6 @@ if len(sys.argv) == 1:
     selectionInput = input("Selection: ")
     if (selectionInput == "1"):       # multiple file names
         print("Enter a single file name one at a time (enter 0 to exit): ")
-        # fileNames = []      # array to make tree
         fileName = ""       # file location var
         loop = True         # infinite loop unless 0 is entered
         while (loop):
@@ -344,15 +343,15 @@ def runChainValidation():
         with open('falseBlocks/' + testFileName + '.block.out') as outputfile:
             # add lines 11 to 40 into testArray1
             for j, line in enumerate(outputfile):
-                if j >= 10:
-                    testArray.append(line)
+                if j >= 10:    # start at line 11
+                    testArray.append(line)  # add line to array
 
-    splits = np.array_split(testArray, len(fileNames))
+    splits = np.array_split(testArray, len(fileNames))  # split array into chunks of 30
     # print(len(splits))
-    empty_list = []
+    empty_list = []    # empty list
     for i in splits:
-        empty_list.append(i.tolist())
-    blockchain.validate_blockchain(fileNames, empty_list)
+        empty_list.append(i.tolist())   # add each chunk to list
+    blockchain.validate_blockchain(fileNames, empty_list)   # validate blockchain
 
 
 # Makes tree if more than 1 argv
@@ -366,8 +365,8 @@ def runChainValidation():
 
 
 for i in range(len(blockchain.blockList)):
-    blockchain.blockHashes.append(blockchain.blockList[i].compute_hash())
-    blockchain.blockPrevHashes.append(blockchain.blockList[i].hash_prev)
+    blockchain.blockHashes.append(blockchain.blockList[i].compute_hash())   # add block hash to list of block hashes
+    blockchain.blockPrevHashes.append(blockchain.blockList[i].hash_prev)    # add block prev hash to list of block prev hashes
     print("BEGIN BLOCK\n")
     print("BEGIN HEADER\n")
     print("Block Root Hash: " + blockchain.blockHashes[i] + "\n")
@@ -405,26 +404,18 @@ for i in range(len(blockchain.blockList) - 1):
         file.write(line)    # write contents of file to new file
     file.close()    # close file
 
-runChainValidation()
+runChainValidation()    # run block validation
 
 
 def checkAddressForBalance():
     while True:
-        addressToCheck = input("Provide an address to check for a balance(40 characters long) \n")
+        addressToCheck = input("Provide an address to check for a balance(40 characters long) \n")  # get address to check
         for i in range(len(merkle_trees)):
-            balance = merkle_trees[i].get_balance(addressToCheck)
+            balance = merkle_trees[i].get_balance(addressToCheck)   # get balance of address
             if (balance is not None):
-                print("\nBalance: ", balance)
+                print("\nBalance: ", balance)   # print balance
                 #print("Proof of Membership path: ", path)
-                return balance
+                return balance  # return balance
         print("Address not found")        
 
-
-# for i in range(len(merkle_trees)):
-#    balance = merkle_trees[i].get_balance('lNUyK89iSV8peQZtrYid9zMNylJFmh5zD5UeLGA')
-#    if(balance is not None):
-#        print("Balance: ", balance)
-#    else:
-#        print("Address not found.")
-
-checkAddressForBalance()
+checkAddressForBalance()    # check address for balance

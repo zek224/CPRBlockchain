@@ -23,6 +23,7 @@ With each block, you will be able to see if it is valid or not. For a block to b
 If all blocks are valid, then we will have a valid BlockChain.
 
 After that, you will be prompted to enter in a 40 character address and to search for that address and return its balance.
-You will continue to be prompted to enter an address until successful.  
+You will continue to be prompted to enter an address until successful.
+You can take an address from the `output` file.  
 Next, an array is printed with the path from the leaf to the root to show proof of membership,
 as well as return the balance.
