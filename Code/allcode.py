@@ -176,7 +176,8 @@ class MerkleTree:
             else:
                 if Leaf.address == address:
                     path.append(Leaf.hashValue)    # add hash value to path for PoM
-                    print(path)    # print path for PoM
+                    res_path=np.flip(path)
+                    print(res_path)    # print path for PoM
                     return Leaf.balance   # return balance
                 else:
                     path.pop()                  # remove hash value from path if incorrect
@@ -285,8 +286,8 @@ def makeTree(fileInputs):
 
         tree = MerkleTree(array)        # make tree from input array ()
         merkle_trees.append(tree)       # add tree to list of trees
-        # tree.printTreeGraphically()     # print tree graphically
-        # print('\n\n\n')
+        tree.printTreeGraphically()     # print tree graphically
+        print('\n\n\n')
         # is this reversed?
         block = Block(
             blockchain.blockList[-1].compute_hash(), tree.getRootHash())
