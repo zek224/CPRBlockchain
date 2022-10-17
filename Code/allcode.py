@@ -34,9 +34,9 @@ class Leaf:
         return (str(self.hashValue))    # return the hash value
 
 
+global_addresses = []   # list of all addresses
+global_balances = []    # list of all balances
 
-global_addresses = []
-global_balances = []
 
 class MerkleTree:
     def __init__(self, array):
@@ -170,7 +170,8 @@ class MerkleTree:
         if Leaf != None:
             if Leaf.left != None:
                 # recursive call
-                path.append(Leaf.hashValue)     # add hash value to path for PoM
+                # add hash value to path for PoM
+                path.append(Leaf.hashValue)
                 return self._findLeaf(Leaf.left, address, path) or self._findLeaf(Leaf.right, address, path)
             else:
                 if Leaf.address == address:
@@ -189,7 +190,7 @@ class MerkleTree:
         place each key value into hashmap
         if address is in hashmap, return balance map['address'], if not return does not exist message
         '''
-        
+
         return self.findLeaf(address, path)
 
 
@@ -263,6 +264,7 @@ class Blockchain():
 blockchain = Blockchain()  # create a blockchain
 blockchain.create_genesis_block()  # create genesis block
 merkle_trees = []   # list of merkle trees
+
 
 def makeTree(fileInputs):
     print("\nInputted files: ", fileInputs, "\n")   # print inputted files
@@ -405,19 +407,21 @@ for i in range(len(blockchain.blockList) - 1):
 
 runChainValidation()
 
+
 def checkAddressForBalance():
-    addressToCheck = input("Provide an address to check for a balance(40 characters long)\n")
-    
+    addressToCheck = input(
+        "Provide an address to check for a balance(40 characters long)\n")
+
     for i in range(len(merkle_trees)):
         balance = merkle_trees[i].get_balance(addressToCheck)
-        if(balance is not None):
+        if (balance is not None):
             print("\nBalance: ", balance)
             #print("Proof of Membership path: ", path)
             return balance
     print("Address not found")
 
 
-#for i in range(len(merkle_trees)):
+# for i in range(len(merkle_trees)):
 #    balance = merkle_trees[i].get_balance('lNUyK89iSV8peQZtrYid9zMNylJFmh5zD5UeLGA')
 #    if(balance is not None):
 #        print("Balance: ", balance)
