@@ -386,13 +386,13 @@ if len(sys.argv) == 1:
         sys.exit(0)    # exit program
 
 
-def runChainValidation():
+def runChainValidation(directory):
     testArray = []
     for i in range(len(fileNames)):
         testFileName = os.path.basename(fileNames[i])   # get file name
         testFileName = testFileName[:-4]    # remove .txt from file name
         # print(testFileName)
-        with open('output/' + testFileName + '.block.out') as outputfile:
+        with open(directory + testFileName + '.block.out') as outputfile:
             # add lines 11 to 40 into testArray1
             for j, line in enumerate(outputfile):
                 if j >= 10:    # start at line 11
@@ -428,18 +428,18 @@ for i in range(len(blockchain.blockList)):
 
 os.mkdir("output")
 
-
+outputFileName=[]
 for i in range(len(blockchain.blockList) - 1):
     file_content = open(fileNames[i], 'r')  # open file
     tempFileName = os.path.basename(fileNames[i])   # get file name
     tempFileName = tempFileName[:-4]    # remove .txt from file name
     file = open('output/' + tempFileName +
                 '.block.out', 'w')   # create new file
+    outputFileName.append( tempFileName +'.block.out')
     file.write("BEGIN BLOCK\n")
     file.write("BEGIN HEADER\n")
     file.write("Hash of root: " + blockchain.blockHashes[i] + "\n")
-    file.write("Hash of previous block: " +
-               blockchain.blockPrevHashes[i] + "\n")
+    file.write("Hash of previous block: " +blockchain.blockPrevHashes[i] + "\n")
     file.write("Timestamp: " + str(blockchain.blockList[i].timestamp) + "\n")
     file.write("Target: " + str(blockchain.blockList[i].target) + "\n")
     file.write("Nonce: " + str(blockchain.blockList[i].set_nonce()) + "\n")
@@ -452,7 +452,7 @@ for i in range(len(blockchain.blockList) - 1):
         file.write(line)    # write contents of file to new file
     file.close()    # close file
 
-runChainValidation()    # run block validation
+runChainValidation('output/')    # run block validation
 
 
 def checkAddressForBalance():
@@ -478,3 +478,31 @@ def checkAddressForBalance():
         print("Address not found")        
 
 checkAddressForBalance()    # check address for balance
+
+os.mkdir("bad")
+print("test for bad block")
+for i in range(len(blockchain.blockList) - 1):
+    bad_content = open(fileNames[i], 'r')  # open file
+    #tempBadFileName = os.path.basename(outputFileName[i])   # get file name
+    #tempBadFileName = tempBadFileName[:-10]    # remove .txt from file name
+    badfile = open('bad/'+outputFileName[i], 'w')   # create new file
+    badfile.write("BEGIN BLOCK\n")
+    badfile.write("BEGIN HEADER\n")
+    badfile.write("Hash of root: " + blockchain.blockHashes[i] + "\n")
+    badfile.write("Hash of previous block: " +blockchain.blockPrevHashes[i] + "\n")
+    badfile.write("Timestamp: " + str(blockchain.blockList[i].timestamp) + "\n")
+    badfile.write("Target: " + str(blockchain.blockList[i].target) + "\n")
+    badfile.write("Nonce: " + str(blockchain.blockList[i].set_nonce()) + "\n")
+    badfile.write("END HEADER\n")
+    badfile.write("END BLOCK\n")
+    badfile.write("------------------------\n")
+    bad_content.close()    # close file
+    bad_content = open(fileNames[i], 'r')  # open file
+    for line in bad_content:
+        #badfile.write("changes")
+        line=line[:-1] 
+        
+        badfile.write(line)    # write contents of file to new file
+    badfile.close()    # close file
+
+runChainValidation('bad/')
