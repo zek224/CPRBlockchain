@@ -37,7 +37,6 @@ class Leaf:
 global_addresses = []   # list of all addresses
 global_balances = []    # list of all balances
 
-
 class MerkleTree:
     def __init__(self, array):
         self.buildTree(array)
@@ -164,6 +163,7 @@ class MerkleTree:
 
     # traverse the merkle tree and find a leaf with the given address
     def findLeaf(self, address, path):
+        path = []   # empties path
         return self._findLeaf(self.root, address, path)    # traverse the tree
 
     def _findLeaf(self, Leaf, address, path):
@@ -176,12 +176,11 @@ class MerkleTree:
             else:
                 if Leaf.address == address:
                     path.append(Leaf.hashValue)    # add hash value to path for PoM
-                    res_path=np.flip(path)
-                    print(res_path)    # print path for PoM
-                    return Leaf.balance   # return balance
+                    path = path[::-1]  # reverse the path
+                    return path, Leaf.balance   # return balance
                 else:
                     path.pop()                  # remove hash value from path if incorrect
-                    return None                # return None if incorrect
+                    return None, None               # return None if incorrect
 
     def get_balance(self, address, path=[]):
         '''
@@ -410,13 +409,20 @@ runChainValidation()    # run block validation
 
 def checkAddressForBalance():
     while True:
-        addressToCheck = input("Provide an address to check for a balance(40 characters long) \n")  # get address to check
+        addressToCheck = input("\n\nProvide an address to check for a balance(40 characters long) \n")  # get address to check
         for i in range(len(merkle_trees)):
-            balance = merkle_trees[i].get_balance(addressToCheck)   # get balance of address
-            if (balance is not None):
-                print("\nBalance: ", balance)   # print balance
-                #print("Proof of Membership path: ", path)
-                return balance  # return balance
+            path, balance = merkle_trees[i].get_balance(addressToCheck)   # get balance of address and Proof of Membership
+            if(balance is not None):
+                print("\nBalance found in Block " + str(i) + ": " + str(balance))
+                print("Proof of Membership (from account to root hash): ")
+                for j in range(len(path)):
+                    if(j == 0):
+                        print("\t", path[j], "\t <- hash at address")
+                    elif(j == (len(path) - 1)):
+                        print("\t", path[j], "\t <- root hash of tree\n")
+                    else:
+                        print("\t", path[j])
+                return
         print("Address not found")        
 
 checkAddressForBalance()    # check address for balance
