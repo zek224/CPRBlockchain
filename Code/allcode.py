@@ -163,6 +163,7 @@ class MerkleTree:
                 # recursive call
                 # add hash value to path for PoM
                 path.append(Leaf.hashValue)
+
                 return self._findLeaf(Leaf.left, address, path) or self._findLeaf(Leaf.right, address, path)    
             else:
                 if Leaf.address == address:
@@ -170,10 +171,19 @@ class MerkleTree:
                     path = path[::-1]   # reverse the path
                     # print(path)    # print path for PoM
                     print("\nBalance at Address: " + Leaf.balance)  # print address
+                    self.printSibling(Leaf.address)  # print sibling path for PoM
                     return path   # return balance
                 else:
                     path.pop()                  # remove hash value from path if incorrect
                     return None              # return None if incorrect
+
+    # print sibling of a Leaf node
+    def printSibling(self, address):
+        path = self.findLeaf(address, [])    # find the leaf
+        if path is None:
+            print("Address not found")
+        else:
+            print("Sibling: " + path[1])    # print sibling of the leaf
 
     def get_balance(self, address, path=[]):
         '''
