@@ -1,5 +1,4 @@
 from array import array
-from time import time
 from typing import List
 import datetime as dt  # for timestamp in header of each block
 import hashlib, sys, os, random, math
@@ -244,13 +243,13 @@ class Blockchain():
     def validate_blockchain(self, inputfiles, empty):
         for i in range(1, len(inputfiles) + 1):
             if (self.blockList[i].validate_block(empty[i - 1]) and blockchain.blockPrevHashes[i] == blockchain.blockHashes[i - 1]): # validate block
-                print("Block " + str(i) + " is valid")  # print valid
+                print("Block " + str(i) + " validated - root hashes match.")  # print valid
             else:
                 print("Block " + str(i) + " is invalid")
                 print("Block hash prev: ", blockchain.blockPrevHashes[i])   # print invalid
                 print("Block hash root: ", blockchain.blockHashes[i - 1])   # print invalid
                 return False
-        print("Blockchain validated.")  # print valid
+        print("All block hashes link to eachother - Blockchain validated.")  # print valid
         return True # return true if valid
 
 # read in each rgument in argv adn append it to an array. then we have array of all filesname / paths to files.
