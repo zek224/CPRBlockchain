@@ -1,3 +1,4 @@
+from glob import glob
 import hashlib, sys, os, random, math, datetime as dt
 
 '''
@@ -26,6 +27,7 @@ class Leaf:
 
 global_addresses = []   # list of all addresses
 global_balances = []    # list of all balances
+global_siblings = []
 
 
 class MerkleTree:
@@ -47,7 +49,7 @@ class MerkleTree:
                     sys.exit(0)
                 if (newBal.isdigit() == False):      # check if balance is a number
                     print("Error: Invalid balance at input line " +
-                          str(values.index(line) + 1) + " " + newBal + "\n")
+                          str(values.index(line) + 1) + "\n")
                     # sys.exit(0)
                 account.append(acct)    # add address to account array
                 balance.append(newBal)     # add balance to balance array
@@ -152,66 +154,11 @@ class MerkleTree:
             print()
         self._printTreeGraphically(node.left, level + 1)    # recursive call
 
-    # traverse the merkle tree and find a leaf with the given address and siblings
-    def traverseTree(self, address):
-        self._traverseTree(self.root, address)
-
-    def _traverseTree(self, node, address):
-        if node is None:
-            return
-        if node.left is None and node.right is None:
-            if node.address == address:
-                print("Found address: ", node.address)
-                print("Balance: ", node.balance)
-                print("Hash: ", node.hashValue)
-                print("Sibling: ", node.right.hashValue)
-                return
-        self._traverseTree(node.left, address)
-        self._traverseTree(node.right, address)
-
-    # get sibling node of the given node
-    def util(self, root, k, ans):
-        if root.left is None and root.right is None:
-            return
-        if k > root.val:
-            if root.right.val == k:
-                ans.append(root.left.val)
-                return
-            else:
-                self.util(root.right, k, ans)
-        if k < root.val:
-            if root.left.val == k:
-                ans.append(root.right.val)
-                return
-            else:
-                self.util(root.left, k, ans)
-
-
     # traverse the merkle tree and find a leaf with the given address
     def findLeaf(self, address, path):
         path = []
         return self._findLeaf(self.root, address, path)    # traverse the tree
 
-    #travere tree to find parent node of the given node
-    def findParent(self, address, path=[]):
-        path = []
-        return self._findParent(self.root, address, path)
-
-    def _findParent(self, leaf, address, path):
-        if leaf is None:
-            return None
-        if leaf.left is None and leaf.right is None:
-            if leaf.address == address:
-                return leaf
-        path.append(leaf)
-        left = self._findParent(leaf.left, address, path)
-        if left:
-            return left
-        right = self._findParent(leaf.right, address, path)
-        if right:
-            return right
-        path.pop()
-        return None
 
     def _findLeaf(self, Leaf, address, path):
         if Leaf != None:
@@ -220,8 +167,6 @@ class MerkleTree:
                 # add hash value to path for PoM
                 path.append(Leaf.hashValue)
                 # find parent of the leaf
-                
-
                 return self._findLeaf(Leaf.left, address, path) or self._findLeaf(Leaf.right, address, path)    
             else:
                 if Leaf.address == address:
@@ -233,6 +178,46 @@ class MerkleTree:
                 else:
                     path.pop()                  # remove hash value from path if incorrect
                     return None              # return None if incorrect
+        
+    def printSibling(self, path):
+        print("Path: " + str(path))
+        global_siblings = []
+        return self._printSibling(self.root, path)    # traverse the tree
+
+    def _printSibling(self, Leaf, path):
+        if Leaf != None and Leaf.left != None and Leaf.right != None:
+            # if address of Leaf in in path
+            #print("PATH----", path)
+            if(Leaf.hashValue == path[0]):
+                global_siblings.append(Leaf.hashValue)  # 1
+            print("Current Leaf -", Leaf.hashValue)
+            #print
+            if Leaf.hashValue in path:
+                # print sibling
+                if(Leaf.left.hashValue in path):
+                    print("In Path: ", Leaf.left.hashValue)
+                    print("Sibling: ", Leaf.right.hashValue)
+                    global_siblings.append(Leaf.left.hashValue)  # 2
+                    global_siblings.append(Leaf.right.hashValue)  # 3
+                    self._printSibling(Leaf.left, path)
+                else:
+                    print("In Path: ", Leaf.right.hashValue)
+                    print("Sibling: ", Leaf.left.hashValue)
+                    global_siblings.append(Leaf.right.hashValue)  # 4
+                    global_siblings.append(Leaf.left.hashValue)  # 5
+                    self._printSibling(Leaf.right, path)
+    
+    # def proveTreeHash():
+    #     # take the last two elements of the array, concatenate them and hash them
+    #     for i in global_siblings:
+    #         last = global_siblings[-i]
+    #         secondtolast = global_siblings[]
+            
+    #         concat = last + secondtolast
+    #         a = Leaf.hash(concat)
+    #         print(concat)
+    #         print(a)
+
 
     def get_balance(self, address, path=[]):
         '''
@@ -337,8 +322,8 @@ def makeTree(fileInputs):
 
         tree = MerkleTree(array)        # make tree from input array ()
         merkle_trees.append(tree)       # add tree to list of trees
-        tree.printTreeGraphically()     # print tree graphically
-        print('\n\n\n')
+        #tree.printTreeGraphically()     # print tree graphically
+        #print('\n\n\n')
         # is this reversed?
         block = Block(
             blockchain.blockList[-1].compute_hash(), tree.getRootHash())
@@ -461,9 +446,14 @@ def checkAddressForBalance():
         # for range len(merkle_trees) to 0
         for i in range(len(merkle_trees) - 1, -1, -1):   # searching from newest to oldest
             path = merkle_trees[i].get_balance(addressToCheck)   # get balance of address
-            # a = merkle_trees[i].findParent("30sUriypEc0okNpv6yz0tESuduDlxgTK6wOZSy3i")  # traverse tree
-            # print(a)
+            #a = merkle_trees[i].printSibling("30sUriypEc0okNpv6yz0tESuduDlxgTK6wOZSy3i")  # traverse tree
+            #print(a)
             if (path is not None):
+                a = merkle_trees[i].printSibling(path[::-1])   # get sibling leaves
+                #print("path reversed: ", path[::-1])
+                #print("sdfghjkl", a)
+                # print global siblings
+                print("Global Siblings: ", global_siblings)
 
                 #print("\nBalance found in Block " + str(i) + ": " + str(balance))
                 print("Proof of Membership (from account to root hash): ")
@@ -478,9 +468,9 @@ def checkAddressForBalance():
         print("Address not found")        
 
 checkAddressForBalance()    # check address for balance
-
+#MerkleTree.proveTreeHash()    # prove tree hash
 os.mkdir("bad")
-print("test for bad block")
+print("Testing for bad block: ")
 for i in range(len(blockchain.blockList) - 1):
     bad_content = open(fileNames[i], 'r')  # open file
     #tempBadFileName = os.path.basename(outputFileName[i])   # get file name
@@ -506,3 +496,6 @@ for i in range(len(blockchain.blockList) - 1):
     badfile.close()    # close file
 
 runChainValidation('bad/')
+
+
+
