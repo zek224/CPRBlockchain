@@ -1,7 +1,4 @@
-from array import array
-from typing import List
-import datetime as dt  # for timestamp in header of each block
-import hashlib, sys, os, random, math
+import hashlib, sys, os, random, math, datetime as dt
 
 '''
 Merkle Tree class
