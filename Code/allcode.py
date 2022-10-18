@@ -1,14 +1,8 @@
-from __future__ import generator_stop
 from array import array
 from time import time
 from typing import List
 import datetime as dt  # for timestamp in header of each block
-import hashlib
-import sys
-import os
-import random
-import numpy as np
-import math
+import hashlib, sys, os, random, math
 
 '''
 Merkle Tree class
@@ -36,6 +30,7 @@ class Leaf:
 
 global_addresses = []   # list of all addresses
 global_balances = []    # list of all balances
+
 
 class MerkleTree:
     def __init__(self, array):
@@ -163,11 +158,7 @@ class MerkleTree:
 
     # traverse the merkle tree and find a leaf with the given address
     def findLeaf(self, address, path):
-<<<<<<< Updated upstream
-        path = []   # empties path
-=======
-        path = []   
->>>>>>> Stashed changes
+        path = []
         return self._findLeaf(self.root, address, path)    # traverse the tree
 
     def _findLeaf(self, Leaf, address, path):
@@ -180,17 +171,13 @@ class MerkleTree:
             else:
                 if Leaf.address == address:
                     path.append(Leaf.hashValue)    # add hash value to path for PoM
-<<<<<<< Updated upstream
-                    path = path[::-1]  # reverse the path
-                    return path, Leaf.balance   # return balance
-=======
                     path = path[::-1]   # reverse the path
-                    print(path)    # print path for PoM
-                    return Leaf.balance   # return balance
->>>>>>> Stashed changes
+                    # print(path)    # print path for PoM
+                    print("\nBalance at Address: " + Leaf.balance)  # print address
+                    return path   # return balance
                 else:
                     path.pop()                  # remove hash value from path if incorrect
-                    return None, None               # return None if incorrect
+                    return None              # return None if incorrect
 
     def get_balance(self, address, path=[]):
         '''
@@ -356,12 +343,11 @@ def runChainValidation():
                 if j >= 10:    # start at line 11
                     testArray.append(line)  # add line to array
 
-    splits = np.array_split(testArray, len(fileNames))  # split array into chunks of 30
-    # print(len(splits))
-    print(splits)
+    # split array into chunks of 30 without numpy
+    splits = [testArray[i:i + 30] for i in range(0, len(testArray), 30)]
     empty_list = []    # empty list
     for i in splits:
-        empty_list.append(i.tolist())   # add each chunk to list
+        empty_list.append(i)   # add each chunk to list
     blockchain.validate_blockchain(fileNames, empty_list)   # validate blockchain
 
 
@@ -422,9 +408,10 @@ def checkAddressForBalance():
     while True:
         addressToCheck = input("\n\nProvide an address to check for a balance(40 characters long) \n")  # get address to check
         for i in range(len(merkle_trees)):
-            path, balance = merkle_trees[i].get_balance(addressToCheck)   # get balance of address and Proof of Membership
-            if(balance is not None):
-                print("\nBalance found in Block " + str(i) + ": " + str(balance))
+            path = merkle_trees[i].get_balance(addressToCheck)   # get balance of address
+            if (path is not None):
+
+                #print("\nBalance found in Block " + str(i) + ": " + str(balance))
                 print("Proof of Membership (from account to root hash): ")
                 for j in range(len(path)):
                     if(j == 0):
