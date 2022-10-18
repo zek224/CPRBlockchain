@@ -154,6 +154,27 @@ class MerkleTree:
             print()
         self._printTreeGraphically(node.left, level + 1)    # recursive call
 
+    def balance(self, address, inputs):
+        '''
+        we need to open every txt file
+        we will use hashmap (every address(key) maps to a balance(value))
+        double for loop (outer for files, inner for line) -> split line into key, value = line.split(' ', 1)
+        place each key value into hashmap
+        if address is in hashmap, return balance map['address'], if not return does not exist message
+        '''
+        addBalMap = {}
+        for i in range(len(fileNames)): #open files
+            testFileName = os.path.basename(fileNames[i])   # get file name
+            testFileName = testFileName[:-4]    # remove .txt from file name
+            for j in range(10, 30, 1): #get addy bal
+                key, value = line.split(' ', 1)
+                addBalMap[key] = value
+        print(addBalMap)
+        if addBalMap.get(address) is not None:
+            print("The balance at address: " + address "is" + addBalMap.get(address))
+        else:
+            print("Does not exist")
+                
 # ------------------------------Begin HW 4-------------------------------------
 
 # • hash of the header of the previous block (zero for the initial genesis block)
