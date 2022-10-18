@@ -163,7 +163,11 @@ class MerkleTree:
 
     # traverse the merkle tree and find a leaf with the given address
     def findLeaf(self, address, path):
+<<<<<<< Updated upstream
         path = []   # empties path
+=======
+        path = []   
+>>>>>>> Stashed changes
         return self._findLeaf(self.root, address, path)    # traverse the tree
 
     def _findLeaf(self, Leaf, address, path):
@@ -176,8 +180,14 @@ class MerkleTree:
             else:
                 if Leaf.address == address:
                     path.append(Leaf.hashValue)    # add hash value to path for PoM
+<<<<<<< Updated upstream
                     path = path[::-1]  # reverse the path
                     return path, Leaf.balance   # return balance
+=======
+                    path = path[::-1]   # reverse the path
+                    print(path)    # print path for PoM
+                    return Leaf.balance   # return balance
+>>>>>>> Stashed changes
                 else:
                     path.pop()                  # remove hash value from path if incorrect
                     return None, None               # return None if incorrect
@@ -340,7 +350,7 @@ def runChainValidation():
         testFileName = os.path.basename(fileNames[i])   # get file name
         testFileName = testFileName[:-4]    # remove .txt from file name
         # print(testFileName)
-        with open('falseBlocks/' + testFileName + '.block.out') as outputfile:
+        with open('output/' + testFileName + '.block.out') as outputfile:
             # add lines 11 to 40 into testArray1
             for j, line in enumerate(outputfile):
                 if j >= 10:    # start at line 11
@@ -348,6 +358,7 @@ def runChainValidation():
 
     splits = np.array_split(testArray, len(fileNames))  # split array into chunks of 30
     # print(len(splits))
+    print(splits)
     empty_list = []    # empty list
     for i in splits:
         empty_list.append(i.tolist())   # add each chunk to list
