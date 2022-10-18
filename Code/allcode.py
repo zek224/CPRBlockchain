@@ -152,10 +152,66 @@ class MerkleTree:
             print()
         self._printTreeGraphically(node.left, level + 1)    # recursive call
 
+    # traverse the merkle tree and find a leaf with the given address and siblings
+    def traverseTree(self, address):
+        self._traverseTree(self.root, address)
+
+    def _traverseTree(self, node, address):
+        if node is None:
+            return
+        if node.left is None and node.right is None:
+            if node.address == address:
+                print("Found address: ", node.address)
+                print("Balance: ", node.balance)
+                print("Hash: ", node.hashValue)
+                print("Sibling: ", node.right.hashValue)
+                return
+        self._traverseTree(node.left, address)
+        self._traverseTree(node.right, address)
+
+    # get sibling node of the given node
+    def util(self, root, k, ans):
+        if root.left is None and root.right is None:
+            return
+        if k > root.val:
+            if root.right.val == k:
+                ans.append(root.left.val)
+                return
+            else:
+                self.util(root.right, k, ans)
+        if k < root.val:
+            if root.left.val == k:
+                ans.append(root.right.val)
+                return
+            else:
+                self.util(root.left, k, ans)
+
+
     # traverse the merkle tree and find a leaf with the given address
     def findLeaf(self, address, path):
         path = []
         return self._findLeaf(self.root, address, path)    # traverse the tree
+
+    #travere tree to find parent node of the given node
+    def findParent(self, address, path=[]):
+        path = []
+        return self._findParent(self.root, address, path)
+
+    def _findParent(self, leaf, address, path):
+        if leaf is None:
+            return None
+        if leaf.left is None and leaf.right is None:
+            if leaf.address == address:
+                return leaf
+        path.append(leaf)
+        left = self._findParent(leaf.left, address, path)
+        if left:
+            return left
+        right = self._findParent(leaf.right, address, path)
+        if right:
+            return right
+        path.pop()
+        return None
 
     def _findLeaf(self, Leaf, address, path):
         if Leaf != None:
@@ -163,6 +219,8 @@ class MerkleTree:
                 # recursive call
                 # add hash value to path for PoM
                 path.append(Leaf.hashValue)
+                # find parent of the leaf
+                
 
                 return self._findLeaf(Leaf.left, address, path) or self._findLeaf(Leaf.right, address, path)    
             else:
@@ -171,19 +229,10 @@ class MerkleTree:
                     path = path[::-1]   # reverse the path
                     # print(path)    # print path for PoM
                     print("\nBalance at Address: " + Leaf.balance)  # print address
-                    self.printSibling(Leaf.address)  # print sibling path for PoM
                     return path   # return balance
                 else:
                     path.pop()                  # remove hash value from path if incorrect
                     return None              # return None if incorrect
-
-    # print sibling of a Leaf node
-    def printSibling(self, address):
-        path = self.findLeaf(address, [])    # find the leaf
-        if path is None:
-            print("Address not found")
-        else:
-            print("Sibling: " + path[1])    # print sibling of the leaf
 
     def get_balance(self, address, path=[]):
         '''
@@ -358,13 +407,9 @@ def runChainValidation():
 
 
 # Makes tree if more than 1 argv
-# if len(sys.argv) > 1:
-#     if (sys.argv[1] == "--validate"):
-#         print("run block validation")
-#         runChainValidation()
-#     else:
-#         # make tree for every file by making an array of file inputs for the tree via argv (ignores argv[0] with is python3 and argv[1] which is program name, takes elements onwards)
-#         makeTree(sys.argv[1:])
+if len(sys.argv) > 1:
+    # make tree for every file by making an array of file inputs for the tree via argv (ignores argv[0] with is python3 and argv[1] which is program name, takes elements onwards)
+    makeTree(sys.argv[1:])
 
 
 for i in range(len(blockchain.blockList)):
@@ -413,8 +458,11 @@ runChainValidation()    # run block validation
 def checkAddressForBalance():
     while True:
         addressToCheck = input("\n\nProvide an address to check for a balance(40 characters long) \n")  # get address to check
-        for i in range(len(merkle_trees)):
+        # for range len(merkle_trees) to 0
+        for i in range(len(merkle_trees) - 1, -1, -1):   # searching from newest to oldest
             path = merkle_trees[i].get_balance(addressToCheck)   # get balance of address
+            # a = merkle_trees[i].findParent("30sUriypEc0okNpv6yz0tESuduDlxgTK6wOZSy3i")  # traverse tree
+            # print(a)
             if (path is not None):
 
                 #print("\nBalance found in Block " + str(i) + ": " + str(balance))
