@@ -56,5 +56,3 @@ We verified for proof of membership by making sure that each block in the blockc
 2. Select either 1 or 2 to run either all txt files or a single txt file
 3. Upon running, enter either a valid or invalid address (40 characters long)
 4. CheckAddressForBalance will return if the address is found or not found.
-
-remove
