@@ -5,30 +5,53 @@ pragma solidity ^0.8.9;
 // import "hardhat/console.sol";
 
 contract Exchange {
-    uint public unlockTime;
-    address payable public owner;
+    event LiquidityProvided(uint amountERC20TokenDeposited, uint amountEthDeposited, uint liquidityPositionsIssued);
+    event LiquidityWithdrew(uint amountERC20TokenWithdrew, uint amountEthWithdrew, uint liquidityPositionsBurned);
+    event SwapForEth(uint amountERC20TokenDeposited, uint amountEthWithdrew);
+    event SwapForERC20Token(uint amountERC20TokenWithdrew, uint amountEthDeposited);
 
-    event Withdrawal(uint amount, uint when);
+    address public ERC20TokenAddress;
+    uint public totalLiquidityPositions;
+    uint public totalERC20TokenDeposited;
+    uint public totalEthDeposited;
 
-    constructor(uint _unlockTime) payable {
-        require(
-            block.timestamp < _unlockTime,
-            "Unlock time should be in the future"
-        );
 
-        unlockTime = _unlockTime;
-        owner = payable(msg.sender);
+
+    constructor(address _ERC20TokenAddress) {
+        ERC20TokenAddress = _ERC20TokenAddress;
     }
 
-    function withdraw() public {
-        // Uncomment this line, and the import of "hardhat/console.sol", to print a log in your terminal
-        // console.log("Unlock time is %o and block timestamp is %o", unlockTime, block.timestamp);
 
-        require(block.timestamp >= unlockTime, "You can't withdraw yet");
-        require(msg.sender == owner, "You aren't the owner");
+    function provideLiquidity(uint _amountERC20Token) external payable {
+        uint ERC20TokenDeposit = IERC20(ERC20TokenAddress).balanceOf(address(this)) - totalERC20TokenDeposited;
+        
 
-        emit Withdrawal(address(this).balance, block.timestamp);
-
-        owner.transfer(address(this).balance);
     }
+
+    function estimateEthToProvide(uint _amountERC20Token){
+
+    }
+
+    function estimateERC20TokenToProvide(uint _amountEth){
+
+    }
+
+    function getMyLiquidityPositions(){
+
+    }
+
+    function withdrawLiquidity(uint _liquidityPositionsToBurn){
+
+    }
+
+    function swapForEth(uint _amountERC20Token){
+
+    }
+
+    function estimateSwapForEth(uint _amountERC20Token){
+
+    }
+
+
+
 }
