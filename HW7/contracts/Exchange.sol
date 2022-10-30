@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
 
@@ -15,8 +17,6 @@ contract Exchange {
     uint public totalERC20TokenDeposited;
     uint public totalEthDeposited;
 
-
-
     constructor(address _ERC20TokenAddress) {
         ERC20TokenAddress = _ERC20TokenAddress;
     }
@@ -24,7 +24,8 @@ contract Exchange {
 
     function provideLiquidity(uint _amountERC20Token) external payable {
         uint ERC20TokenDeposit = IERC20(ERC20TokenAddress).balanceOf(address(this)) - totalERC20TokenDeposited;
-        
+
+
 
     }
 
@@ -40,7 +41,9 @@ contract Exchange {
 
     }
 
-    function withdrawLiquidity(uint _liquidityPositionsToBurn){
+    function withdrawLiquidity(uint _liquidityPositionsToBurn) external {
+
+    }
 
     }
 
