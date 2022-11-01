@@ -21,23 +21,30 @@ contract Exchange {
         ERC20TokenAddress = _ERC20TokenAddress;
     }
 
+    function provideLiquidity() external payable {
+        uint amountERC20TokenDeposited = IERC20(ERC20TokenAddress).balanceOf(address(this)) - totalERC20TokenDeposited;
+        uint amountEthDeposited = address(this).balance - totalEthDeposited;
+        uint liquidityPositionsIssued = 0;
+        if (totalLiquidityPositions == 0) {
+            liquidityPositionsIssued = (amountERC20TokenDeposited * amountEthDeposited) / 1000000000000000000;
+        } else {
+            liquidityPositionsIssued = (amountERC20TokenDeposited * totalLiquidityPositions) / totalERC20TokenDeposited;
+        }
+        totalLiquidityPositions += liquidityPositionsIssued;
+        totalERC20TokenDeposited += amountERC20TokenDeposited;
+        totalEthDeposited += amountEthDeposited;
+        emit LiquidityProvided(amountERC20TokenDeposited, amountEthDeposited, liquidityPositionsIssued);
+    }
 
-    function provideLiquidity(uint _amountERC20Token) external payable {
-        uint ERC20TokenDeposit = IERC20(ERC20TokenAddress).balanceOf(address(this)) - totalERC20TokenDeposited;
-
-
+    function estimateEthToProvide(uint _amountERC20Token) public view{
 
     }
 
-    function estimateEthToProvide(uint _amountERC20Token){
+    function estimateERC20TokenToProvide(uint _amountEth) public view{
 
     }
 
-    function estimateERC20TokenToProvide(uint _amountEth){
-
-    }
-
-    function getMyLiquidityPositions(){
+    function getMyLiquidityPositions() public view {
 
     }
 
@@ -45,16 +52,12 @@ contract Exchange {
 
     }
 
-    }
-
-    function swapForEth(uint _amountERC20Token){
+    function swapForEth(uint _amountERC20Token) public view {
 
     }
 
-    function estimateSwapForEth(uint _amountERC20Token){
+    function estimateSwapForEth(uint _amountERC20Token) public view{
 
     }
-
-
 
 }
