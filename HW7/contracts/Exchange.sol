@@ -38,13 +38,7 @@ contract Exchange {
         ERC20TokenAddress = _ERC20TokenAddress;
     }
 
-    //transfer ERC20 token to this contract
-    // function transferERC20TokenToContract(uint _amountERC20Token) external {
-    //     IERC20(ERC20TokenAddress).transferFrom(msg.sender, address(this), _amountERC20Token);
-    // }
-
     function provideLiquidity(uint _amountERC20Token) external payable {
-        curRatio = totalEthDeposited / totalERC20TokenDeposited;
 
         // transferERC20TokenToContract(_amountERC20Token);
         // uint amountERC20TokenDeposited = IERC20(ERC20TokenAddress).balanceOf(address(this)) - totalERC20TokenDeposited;
@@ -69,11 +63,17 @@ contract Exchange {
         return amountERC20;
     }
 
-    function getMyLiquidityPositions() public view {}
+    function getMyLiquidityPositions() public view returns (uint) {
+        return liquidityPositions[msg.sender];
+    }
 
     function withdrawLiquidity(uint _liquidityPositionsToBurn) external {}
 
     function swapForEth(uint _amountERC20Token) public view {}
 
     function estimateSwapForEth(uint _amountERC20Token) public view {}
+
+    function swapForERC20Token() payable public returns (uint) {}
+
+    function estimateSwapForERC20Token(uint _amountEth) public view returns (uint){}
 }
