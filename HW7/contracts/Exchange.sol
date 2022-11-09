@@ -9,57 +9,74 @@ import "hardhat/console.sol";
 
 contract Exchange {
     event LiquidityProvided(
-        uint256 amountERC20TokenDeposited,
-        uint256 amountEthDeposited,
-        uint256 liquidityPositionsIssued
+        uint amountERC20TokenDeposited,
+        uint amountEthDeposited,
+        uint liquidityPositionsIssued
     );
     event LiquidityWithdrew(
-        uint256 amountERC20TokenWithdrew,
-        uint256 amountEthWithdrew,
-        uint256 liquidityPositionsBurned
+        uint amountERC20TokenWithdrew,
+        uint amountEthWithdrew,
+        uint liquidityPositionsBurned
     );
     event SwapForEth(
-        uint256 amountERC20TokenDeposited,
-        uint256 amountEthWithdrew
+        uint amountERC20TokenDeposited,
+        uint amountEthWithdrew
     );
     event SwapForERC20Token(
-        uint256 amountERC20TokenWithdrew,
-        uint256 amountEthDeposited
+        uint amountERC20TokenWithdrew,
+        uint amountEthDeposited
     );
 
     address public ERC20TokenAddress;
-    uint256 public totalLiquidityPositions;
-    uint256 public totalERC20TokenDeposited;
-    uint256 public totalEthDeposited;
-    uint256 public K;
-    mapping(address => uint256) public liquidityPositions;
+    uint public totalLiquidityPositions;
+    uint public K;
+    mapping(address => uint) public liquidityPositions;
 
     constructor(address _ERC20TokenAddress) {
         ERC20TokenAddress = _ERC20TokenAddress;
     }
 
+    function ethBalance() public view returns (uint) {
+        return address(this).balance;
+    }
+
+    function erc20TokenBalance() public view returns (uint) {
+        return ERC20(ERC20TokenAddress).balanceOf(address(this));
+    }
+
     function provideLiquidity(uint _amountERC20Token) external payable {
+        require(_amountERC20Token > 0, "Amount must be greater than 0");
+        require(msg.value > 0, "Amount must be greater than 0");
+        uint liquidityPositionsIssued = 0;
 
-        // transferERC20TokenToContract(_amountERC20Token);
-        // uint amountERC20TokenDeposited = IERC20(ERC20TokenAddress).balanceOf(address(this)) - totalERC20TokenDeposited;
+        if(totalLiquidityPositions == 0) {
+            liquidityPositionsIssued = 100;
+        } else {
+            require((totalLiquidityPositions * _amountERC20Token)/ erc20TokenBalance() == (totalLiquidityPositions * msg.value) / (ethBalance() - msg.value), "You must send ETH to provide liquidity");
+            liquidityPositionsIssued = totalLiquidityPositions * _amountERC20Token / erc20TokenBalance();
+        }
 
-        // uint amountERC20TokenDeposited = IERC20(ERC20TokenAddress).balanceOf(address(this)) - totalERC20TokenDeposited;
-        // uint amountEthDeposited = address(this).balance - totalEthDeposited;
-        // uint liquidityPositionsIssued = 0;
+        require(ERC20(ERC20TokenAddress).transferFrom(msg.sender, address(this), _amountERC20Token), "You must approve the contract to transfer your ERC20 tokens");
+        liquidityPositions[msg.sender] += liquidityPositionsIssued;
+        totalLiquidityPositions += liquidityPositionsIssued;
+
+        K = ethBalance() * erc20TokenBalance();
+
+        emit LiquidityProvided(_amountERC20Token, msg.value, liquidityPositionsIssued);
+        return liquidityPositionsIssued;
+
+        //amountEth -> msg.value
+        //use transferFrom to transfer ERC20Token from msg.sender to this contract
     }
 
     function estimateEthToProvide(uint _amountERC20Token) public view returns (uint)
     {
-        uint contractEthBalance = address(this).balance;
-        uint contractERC20TokenBalance = IERC20(ERC20TokenAddress).balanceOf(address(this));
-        uint amountEth = (contractEthBalance * _amountERC20Token) / contractERC20TokenBalance;
+        uint amountEth = (ethBalance() * _amountERC20Token) / erc20TokenBalance();
         return amountEth;
     }
 
     function estimateERC20TokenToProvide(uint _amountEth) public view returns (uint) {
-        uint contractEthBalance = address(this).balance;
-        uint contractERC20TokenBalance = IERC20(ERC20TokenAddress).balanceOf(address(this));
-        uint amountERC20 = (contractERC20TokenBalance * _amountERC20Token) / contractEthBalance;
+        uint amountERC20 = (erc20TokenBalance() * _amountEth) / ethBalance();
         return amountERC20;
     }
 
@@ -67,11 +84,29 @@ contract Exchange {
         return liquidityPositions[msg.sender];
     }
 
-    function withdrawLiquidity(uint _liquidityPositionsToBurn) external {}
+    function withdrawLiquidity(uint _liquidityPositionsToBurn) public returns (uint, uint) {
+        uint amountEthToSend = _liquidityPositionsToBurn * ethBalance() / totalLiquidityPositions;
+        uint amountERC20TokenToSend = _liquidityPositionsToBurn * erc20TokenBalance() / totalLiquidityPositions;
+        
+        require(liquidityPositions[msg.sender] >= _liquidityPositionsToBurn, "You don't have enough liquidity positions to burn");
+        require(_liquidityPositionsToBurn < totalLiquidityPositions, "You can't burn all liquidity positions");
+        
+        liquidityPositions[msg.sender] -= _liquidityPositionsToBurn;
+        totalLiquidityPositions -= _liquidityPositionsToBurn;
 
-    function swapForEth(uint _amountERC20Token) public view {}
+        require(payable(msg.sender).send(amountEthToSend), "You must have enough ETH to withdraw");
+        require(ERC20(ERC20TokenAddress).transfer(msg.sender, amountERC20TokenToSend), "You must have enough ERC20 tokens to withdraw");
+       
+        K = ethBalance() * erc20TokenBalance();
+        
+        emit LiquidityWithdrew(amountERC20TokenToSend, amountEthToSend, _liquidityPositionsToBurn);
+        return (amountERC20TokenToSend, amountEthToSend);
+        
+    }
 
-    function estimateSwapForEth(uint _amountERC20Token) public view {}
+    function swapForEth(uint _amountERC20Token) public returns (uint) {}
+
+    function estimateSwapForEth(uint _amountERC20Token) public view returns (uint){}
 
     function swapForERC20Token() payable public returns (uint) {}
 
