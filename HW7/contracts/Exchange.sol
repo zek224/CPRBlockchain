@@ -106,9 +106,21 @@ contract Exchange {
 
     function swapForEth(uint _amountERC20Token) public returns (uint) {}
 
-    function estimateSwapForEth(uint _amountERC20Token) public view returns (uint){}
+    function estimateSwapForEth(uint _amountERC20Token) public view returns (uint){
+        uint contractEthBalanceAfterSwap = K / (erc20TokenBalance() - _amountERC20Token);
+        uint ethToSend = ethBalance() - contractEthBalanceAfterSwap;
 
-    function swapForERC20Token() payable public returns (uint) {}
+        return ethToSend;
+    }
 
-    function estimateSwapForERC20Token(uint _amountEth) public view returns (uint){}
+    function swapForERC20Token() payable public returns (uint) {
+
+    }
+
+    function estimateSwapForERC20Token(uint _amountEth) public view returns (uint){
+        uint contractERC20TokenBalanceAfterSwap = K / (ethBalance() - _amountEth);
+        uint erc20TokenToSend = erc20TokenBalance() - contractERC20TokenBalanceAfterSwap;
+
+        return erc20TokenToSend;
+    }
 }
