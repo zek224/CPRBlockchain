@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.7;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
@@ -47,8 +47,11 @@ contract Exchange {
     }
 
     function provideLiquidity(uint _amountERC20Token) external payable returns (uint) {
+        require(ERC20(ERC20TokenAddress).transferFrom(msg.sender, address(this), _amountERC20Token), "You must approve the contract to transfer your ERC20 tokens");
+        require(payable(msg.sender).transfer(msg.value), "You must approve the contract to transfer your ETH");
         require(_amountERC20Token > 0, "Amount must be greater than 0");
         require(msg.value > 0, "Amount must be greater than 0");
+        
         uint liquidityPositionsIssued = 0;
 
         if(totalLiquidityPositions == 0) {
@@ -58,7 +61,6 @@ contract Exchange {
             liquidityPositionsIssued = totalLiquidityPositions * _amountERC20Token / erc20TokenBalance();
         }
 
-        require(ERC20(ERC20TokenAddress).transferFrom(msg.sender, address(this), _amountERC20Token), "You must approve the contract to transfer your ERC20 tokens");
         liquidityPositions[msg.sender] += liquidityPositionsIssued;
         totalLiquidityPositions += liquidityPositionsIssued;
 
