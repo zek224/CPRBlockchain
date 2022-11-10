@@ -36,15 +36,17 @@ contract Exchange {
         ERC20TokenAddress = _ERC20TokenAddress;
     }
 
+    //helper function
     function ethBalance() public view returns (uint) {
         return address(this).balance;
     }
 
+    //helper function
     function erc20TokenBalance() public view returns (uint) {
         return ERC20(ERC20TokenAddress).balanceOf(address(this));
     }
 
-    function provideLiquidity(uint _amountERC20Token) external payable {
+    function provideLiquidity(uint _amountERC20Token) external payable returns (uint) {
         require(_amountERC20Token > 0, "Amount must be greater than 0");
         require(msg.value > 0, "Amount must be greater than 0");
         uint liquidityPositionsIssued = 0;
@@ -128,7 +130,9 @@ contract Exchange {
     }
 
     function swapForERC20Token() payable public returns (uint) {
-        require(address(receiverAdr).transfer(msg.value), "You must have enough ETH to swap");
+        require(msg.value > 0, "Amount must be greater than 0");
+        
+        require(payable(address(this)).send(msg.value), "You must have enough ETH to swap");
 
         uint contractERC20TokenBalanceAfterSwap = K / ethBalance();
         
