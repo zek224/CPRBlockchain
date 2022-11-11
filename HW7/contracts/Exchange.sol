@@ -46,11 +46,11 @@ contract Exchange {
         return ERC20(ERC20TokenAddress).balanceOf(address(this));
     }
 
-    function provideLiquidity(uint _amountERC20Token) external payable returns (uint) {
-        require(ERC20(ERC20TokenAddress).transferFrom(msg.sender, address(this), _amountERC20Token), "You must approve the contract to transfer your ERC20 tokens");
-        require(payable(msg.sender).transfer(msg.value), "You must approve the contract to transfer your ETH");
+    function provideLiquidity(uint _amountERC20Token) payable public returns (uint) {
+
         require(_amountERC20Token > 0, "Amount must be greater than 0");
-        require(msg.value > 0, "Amount must be greater than 0");
+        //transfer Eth to this contract
+        require(msg.value > 0, "Amount Eth must be greater than 0");
         
         uint liquidityPositionsIssued = 0;
 
@@ -58,8 +58,10 @@ contract Exchange {
             liquidityPositionsIssued = 100;
         } else {
             require((totalLiquidityPositions * _amountERC20Token)/ erc20TokenBalance() == (totalLiquidityPositions * msg.value) / (ethBalance() - msg.value), "You must send ETH to provide liquidity");
-            liquidityPositionsIssued = totalLiquidityPositions * _amountERC20Token / erc20TokenBalance();
+            liquidityPositionsIssued = (totalLiquidityPositions * _amountERC20Token) / erc20TokenBalance();
         }
+
+        require(ERC20(ERC20TokenAddress).transferFrom(msg.sender, address(this), _amountERC20Token), "You must approve the contract to transfer your ERC20 tokens");
 
         liquidityPositions[msg.sender] += liquidityPositionsIssued;
         totalLiquidityPositions += liquidityPositionsIssued;
@@ -110,10 +112,9 @@ contract Exchange {
 
     function swapForEth(uint _amountERC20Token) public returns (uint) {
         require(_amountERC20Token > 0, "Amount must be greater than 0");
-        
-        uint contractEthBalanceAfterSwap = K / (erc20TokenBalance() - _amountERC20Token);
-        uint ethToSend = ethBalance() - contractEthBalanceAfterSwap;
 
+        uint contractEthBalanceAfterSwap = K / (erc20TokenBalance() + _amountERC20Token);
+        uint ethToSend = ethBalance() - contractEthBalanceAfterSwap;
         require(ERC20(ERC20TokenAddress).transferFrom(msg.sender, address(this), _amountERC20Token), "You must approve the contract to transfer your ERC20 tokens");
 
         require(payable(msg.sender).send(ethToSend), "You must have enough ETH to swap");
@@ -125,7 +126,7 @@ contract Exchange {
     }
 
     function estimateSwapForEth(uint _amountERC20Token) public view returns (uint){
-        uint contractEthBalanceAfterSwap = K / (erc20TokenBalance() - _amountERC20Token);
+        uint contractEthBalanceAfterSwap = K / (erc20TokenBalance() + _amountERC20Token);
         uint ethToSend = ethBalance() - contractEthBalanceAfterSwap;
 
         return ethToSend;
@@ -134,9 +135,7 @@ contract Exchange {
     function swapForERC20Token() payable public returns (uint) {
         require(msg.value > 0, "Amount must be greater than 0");
         
-        require(payable(address(this)).send(msg.value), "You must have enough ETH to swap");
-
-        uint contractERC20TokenBalanceAfterSwap = K / ethBalance();
+        uint contractERC20TokenBalanceAfterSwap = K / (ethBalance() + msg.value);
         
         uint ERC20TokenToSend = erc20TokenBalance() - contractERC20TokenBalanceAfterSwap;
 
@@ -149,7 +148,7 @@ contract Exchange {
     }
 
     function estimateSwapForERC20Token(uint _amountEth) public view returns (uint){
-        uint contractERC20TokenBalanceAfterSwap = K / (ethBalance() - _amountEth);
+        uint contractERC20TokenBalanceAfterSwap = K / (ethBalance() + _amountEth);
         uint erc20TokenToSend = erc20TokenBalance() - contractERC20TokenBalanceAfterSwap;
 
         return erc20TokenToSend;
